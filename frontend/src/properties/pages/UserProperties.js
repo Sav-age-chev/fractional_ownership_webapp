@@ -22,7 +22,7 @@ const DUMMY_PROPERTIES = [
       lat: 53.4721254,
       lng: -2.3026691,
     },
-    owner: "u1",
+    creator: "u1",
   },
   {
     id: "p2",
@@ -37,14 +37,14 @@ const DUMMY_PROPERTIES = [
       lat: 40.7484405,
       lng: -73.9878531,
     },
-    owner: "u2",
+    creator: "u2",
   },
 ];
 
 const UserProperties = () => {
   const userId = useParams().userId;
   const loadedProperties = DUMMY_PROPERTIES.filter(
-    (property) => property.owner === userId
+    (property) => property.creator === userId
   );
   return <PropertyList items={loadedProperties} />;
 };

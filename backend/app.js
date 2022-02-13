@@ -9,14 +9,25 @@ const bodyParser = require('body-parser');
 
 //local imports
 const propertiesRoutes = require('./routes/properties-routes');
+const HttpError = require('./models/http-error');
 
 //instantiating [app] object(server)
 const app = express();
 
 //---------------------Middleware----------------------------
 
-//add to use
+//add to use.
+//bodyParser should be before anything else as the route its shorter. It will extract any given json data and convert to JS data structure.
+//Once data is collected, [next()] is automatically called, next method triggered and receives the newly collected data
+app.use(bodyParser.json());
+
 app.use('/api/properties', propertiesRoutes);
+
+//Handling all unspecified routes. It is called if there was no respond from the previous methods
+app.use((req, res, next) => {
+    const error = new HttpError('Could not find this route.', 404);
+    throw error;
+});
 
 //handling route errors. Below function will be called if there is an error with the request
 app.use((error, req, res, next) => {

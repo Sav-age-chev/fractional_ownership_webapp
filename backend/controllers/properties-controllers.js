@@ -2,11 +2,14 @@
  * [properties-controllers.js] file contain all functions for the properties routes
  */
 
-//local imports
-const HttpError = require('../models/http-error');
+//import libraries
+const uuid = require("uuid");
 
-//Dummy data to use while don't have database
-const DUMMY_PROPERTIES = [
+//local imports
+const HttpError = require("../models/http-error");
+
+//dummy data to use while don't have database
+let DUMMY_PROPERTIES = [
   {
     id: "p1",
     title: "1604 The Heart",
@@ -15,12 +18,12 @@ const DUMMY_PROPERTIES = [
     //imageUrl: 'https://upload.wikimedia.org/wikipedia/commons/thumb/d/df/NYC_Empire_State_Building,jpg/640px-NYC_Empire_State_Building.jpg',
     imageUrl:
       "https://c7.alamy.com/comp/CCCC9M/media-city-footbridge-and-studios-at-mediacityuk-at-night-salford-CCCC9M.jpg",
-    address: "Blue Media City, Salford, United Kingdom M50 2TH",
     location: {
       lat: 53.4721254,
       lng: -2.3026691,
     },
-    owner: "u1",
+    address: "Blue Media City, Salford, United Kingdom M50 2TH",
+    creator: "u1",
   },
   {
     id: "p2",
@@ -35,11 +38,12 @@ const DUMMY_PROPERTIES = [
       lat: 40.7484405,
       lng: -73.9878531,
     },
-    owner: "u2",
+    address: "20 W 34th St, New York, NY 10001, United States",
+    creator: "u2",
   },
 ];
 
-//Get property by id
+//get property by id
 const getPropertyById = (req, res, next) => {
   //get the property by comparing id from url against database
   const propertyId = req.params.pid;
@@ -48,7 +52,7 @@ const getPropertyById = (req, res, next) => {
   });
   //returns error in case no property was found
   if (!property) {
-    throw new HttpError("Could not find a place for the provided id.", 404);
+    throw new HttpError("Could not find a property for the provided id.", 404);
   }
 
   //response to the request. In this case {property} == {property: property}
@@ -56,23 +60,78 @@ const getPropertyById = (req, res, next) => {
 };
 
 //Get property by user id
-const getPropertyByUserId = (req, res, next) => {
-  //get the property by comparing id from url against database
+const getPropertiesByUserId = (req, res, next) => {
+  //get the properties by comparing id from url against database
   const userId = req.params.uid;
-  const property = DUMMY_PROPERTIES.find((p) => {
-    return p.owner === userId;
+  const properties = DUMMY_PROPERTIES.filter((p) => {
+    return p.creator === userId;
   });
-  //returns error in case no property was found
-  if (!property) {
+  //returns error in case no properties was found
+  if (!properties || properties.length === 0) {
     return next(
-      new HttpError("Could not find a place for the provided user id.", 404)
+      new HttpError("Could not find properties for the provided user id.", 404)
     );
   }
 
-  //response to the request. In this case {property} == {property: property}
-  res.json({ property });
+  //response to the request. In this case {properties} == {properties: properties}
+  res.json({ properties });
 };
 
-//exporting function pointers rather than executables
+//create new property
+const createProperty = (req, res, next) => {
+  //object destructuring
+  const { title, description, coordinates, address, creator } = req.body;
+  const createdProperty = {
+    id: uuid.v4(),
+    title,
+    description,
+    location: coordinates,
+    address,
+    creator,
+  };
+
+  //adding the new property to the database
+  DUMMY_PROPERTIES.push(createdProperty);
+
+  //response to the request. In this case {property} == {property: property}
+  res.status(201).json({ property: createdProperty });
+};
+
+//update existing property
+const updateProperty = (req, res, next) => {
+  //get data from the body
+  const { title, description } = req.body;
+  //get id from the url
+  const propertyId = req.params.pid;
+
+  //creates a copy of the property
+  const updatedProperty = {
+    ...DUMMY_PROPERTIES.find((p) => p.id === propertyId),
+  };
+  //get the index from the array for the selected property
+  const propertyIndex = DUMMY_PROPERTIES.findIndex((p) => p.id === propertyId);
+  //updating details
+  updatedProperty.title = title;
+  updatedProperty.description = description;
+  //replacing the old with the new property
+  DUMMY_PROPERTIES[propertyIndex] = updatedProperty;
+  //response to the request
+  res.status(200).json({ property: updatedProperty });
+};
+
+//delete existing property
+const deleteProperty = (req, res, next) => {
+  //get id from the url
+  const propertyId = req.params.pid;
+  //creating new array that replacing the old one once the loop completes. It keeps all entries but the match
+  DUMMY_PROPERTIES = DUMMY_PROPERTIES.filter((p) => p.id !== propertyId);
+  //response to the request
+  res.status(200).json({ message: "Deleted place." });
+};
+
+//exporting functions pointers rather than executables
 exports.getPropertyById = getPropertyById;
-exports.getPropertyByUserId = getPropertyByUserId;
+exports.getPropertiesByUserId = getPropertiesByUserId;
+exports.createProperty = createProperty;
+exports.updateProperty = updateProperty;
+exports.deleteProperty = deleteProperty;
