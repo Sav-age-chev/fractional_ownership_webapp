@@ -9,6 +9,7 @@ const bodyParser = require('body-parser');
 
 //local imports
 const propertiesRoutes = require('./routes/properties-routes');
+const usersRoutes = require('./routes/users-routes')
 const HttpError = require('./models/http-error');
 
 //instantiating [app] object(server)
@@ -22,6 +23,7 @@ const app = express();
 app.use(bodyParser.json());
 
 app.use('/api/properties', propertiesRoutes);
+app.use('/api/users', usersRoutes);
 
 //Handling all unspecified routes. It is called if there was no respond from the previous methods
 app.use((req, res, next) => {

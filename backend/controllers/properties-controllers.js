@@ -4,6 +4,7 @@
 
 //import libraries
 const uuid = require("uuid");
+const { validationResult } = require("express-validator");
 
 //local imports
 const HttpError = require("../models/http-error");
@@ -79,11 +80,17 @@ const getPropertiesByUserId = (req, res, next) => {
 
 //create new property
 const createProperty = (req, res, next) => {
+  //check validation results and return error in case is not empty
+  const errors = validationResult(req);
+  if (!errors.isEmpty()) {
+    throw new HttpError("Invalid inputs passed, please check your data.", 422);
+  }
+
   //object destructuring
   const { title, description, coordinates, address, creator } = req.body;
   const createdProperty = {
     id: uuid.v4(),
-    title,
+    title, //When same name: (title == title: title)
     description,
     location: coordinates,
     address,
@@ -99,6 +106,12 @@ const createProperty = (req, res, next) => {
 
 //update existing property
 const updateProperty = (req, res, next) => {
+  //check validation results and return error in case is not empty
+  const errors = validationResult(req);
+  if (!errors.isEmpty()) {
+    throw new HttpError("Invalid inputs passed, please check your data.", 422);
+  }
+
   //get data from the body
   const { title, description } = req.body;
   //get id from the url
@@ -123,10 +136,14 @@ const updateProperty = (req, res, next) => {
 const deleteProperty = (req, res, next) => {
   //get id from the url
   const propertyId = req.params.pid;
+  //check if the property exist in the database
+  if (!DUMMY_PROPERTIES.find((p) => p.id === propertyId)) {
+    throw new HttpError("Could not find the property", 404);
+  }
   //creating new array that replacing the old one once the loop completes. It keeps all entries but the match
   DUMMY_PROPERTIES = DUMMY_PROPERTIES.filter((p) => p.id !== propertyId);
   //response to the request
-  res.status(200).json({ message: "Deleted place." });
+  res.status(200).json({ message: "Property deleted." });
 };
 
 //exporting functions pointers rather than executables

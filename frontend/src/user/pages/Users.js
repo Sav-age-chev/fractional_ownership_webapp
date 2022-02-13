@@ -7,18 +7,17 @@ import UsersList from "../components/UsersList";
  */
 
 const Users = () => {
-    const USERS = [
-        {
-            id: 'u1', 
-            name: 'Plamen Savchev', 
-            image: 'https://images.pexels.com/photos/614810/pexels-photo-614810.jpeg?auto=compress&cs=tinysrgb&dpr=3&h=750&w=1260/', 
-            properties: 3
-        }
-    ];
+  const USERS = [
+    {
+      id: "u1",
+      name: "Plamen Savchev",
+      image:
+        "https://images.pexels.com/photos/614810/pexels-photo-614810.jpeg?auto=compress&cs=tinysrgb&dpr=3&h=750&w=1260/",
+      properties: 3,
+    },
+  ];
 
-    return (
-        <UsersList items={USERS} />
-    );
+  return <UsersList items={USERS} />;
 };
 
 export default Users;
