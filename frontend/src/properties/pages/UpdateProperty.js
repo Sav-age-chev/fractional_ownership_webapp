@@ -26,7 +26,7 @@ const DUMMY_PROPERTIES = [
       lat: 53.4721254,
       lng: -2.3026691,
     },
-    creator: "u1",
+    owner: "u1",
   },
   {
     id: "p2",
@@ -41,7 +41,7 @@ const DUMMY_PROPERTIES = [
       lat: 40.7484405,
       lng: -73.9878531,
     },
-    creator: "u2",
+    owner: "u2",
   },
 ];
 

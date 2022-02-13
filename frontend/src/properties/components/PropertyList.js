@@ -32,7 +32,7 @@ const PropertyList = (props) => {
           title={property.title}
           description={property.description}
           address={property.address}
-          creatorId={property.creator}
+          ownerId={property.owner}
           coordinates={property.location}
         />
       ))}
