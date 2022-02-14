@@ -8,6 +8,7 @@ const { validationResult } = require("express-validator");
 
 //local imports
 const HttpError = require("../models/http-error");
+const getCoordsForAddress = require("../util/location");
 
 //dummy data to use while don't have database
 let DUMMY_PROPERTIES = [
@@ -79,15 +80,26 @@ const getPropertiesByUserId = (req, res, next) => {
 };
 
 //create new property
-const createProperty = (req, res, next) => {
+const createProperty = async (req, res, next) => {
   //check validation results and return error in case is not empty
   const errors = validationResult(req);
   if (!errors.isEmpty()) {
-    throw new HttpError("Invalid inputs passed, please check your data.", 422);
+    return next(
+      new HttpError("Invalid inputs passed, please check your data.", 422)
+    );
   }
 
   //object destructuring
-  const { title, description, coordinates, address, creator } = req.body;
+  const { title, description, address, creator } = req.body;
+
+  //convert address to coordinates
+  let coordinates;
+  try {
+    coordinates = await getCoordsForAddress(address);
+  } catch (error) {
+    return next(error);
+  }
+
   const createdProperty = {
     id: uuid.v4(),
     title, //When same name: (title == title: title)
