@@ -4,13 +4,14 @@
  */
 
 //import libraries
-const express = require('express');
-const bodyParser = require('body-parser');
+const express = require("express");
+const bodyParser = require("body-parser");
+const mongoose = require("mongoose");
 
 //local imports
-const propertiesRoutes = require('./routes/properties-routes');
-const usersRoutes = require('./routes/users-routes')
-const HttpError = require('./models/http-error');
+const propertiesRoutes = require("./routes/properties-routes");
+const usersRoutes = require("./routes/users-routes");
+const HttpError = require("./models/http-error");
 
 //instantiating [app] object(server)
 const app = express();
@@ -22,26 +23,37 @@ const app = express();
 //Once data is collected, [next()] is automatically called, next method triggered and receives the newly collected data
 app.use(bodyParser.json());
 
-app.use('/api/properties', propertiesRoutes);
-app.use('/api/users', usersRoutes);
+app.use("/api/properties", propertiesRoutes);
+app.use("/api/users", usersRoutes);
 
 //Handling all unspecified routes. It is called if there was no respond from the previous methods
 app.use((req, res, next) => {
-    const error = new HttpError('Could not find this route.', 404);
-    throw error;
+  const error = new HttpError("Could not find this route.", 404);
+  throw error;
 });
 
 //handling route errors. Below function will be called if there is an error with the request
 app.use((error, req, res, next) => {
-    if (res.headerSent) {
-        return next(error);
-    }
+  if (res.headerSent) {
+    return next(error);
+  }
 
-    res.status(error.code || 500);
-    res.json({message: error.message || 'An unknown error occurred!'});
+  res.status(error.code || 500);
+  res.json({ message: error.message || "An unknown error occurred!" });
 });
 
 //---------------------Middleware----------------------------
 
-//listen to certain port
-app.listen(5000);
+//---------------------Database------------------------------
+//[connect()] connect to the database as an asynchronous. [then()] if successful listen to the port or returns an error
+mongoose
+  .connect(
+    "mongodb+srv://Savchev:namkaq-cicpap-5vycZo@cluster0.3mjmp.mongodb.net/properties?retryWrites=true&w=majority"
+  )
+  .then(() => {
+    //listen to certain port
+    app.listen(5000);
+  })
+  .catch((err) => {
+    console.log(err);
+  });

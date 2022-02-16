@@ -9,6 +9,7 @@ const { validationResult } = require("express-validator");
 //local imports
 const HttpError = require("../models/http-error");
 const getCoordsForAddress = require("../util/location");
+const Property = require("../models/property");
 
 //dummy data to use while don't have database
 let DUMMY_PROPERTIES = [
@@ -45,20 +46,35 @@ let DUMMY_PROPERTIES = [
   },
 ];
 
-//get property by id
-const getPropertyById = (req, res, next) => {
+//get property by id. Asynchronous task
+const getPropertyById = async (req, res, next) => {
   //get the property by comparing id from url against database
   const propertyId = req.params.pid;
-  const property = DUMMY_PROPERTIES.find((p) => {
-    return p.id === propertyId;
-  });
-  //returns error in case no property was found
-  if (!property) {
-    throw new HttpError("Could not find a property for the provided id.", 404);
+
+  let property;
+  //try to get property by id from database with an asynchronous method. Catch and display error if fail
+  try {
+    //get the property from the database
+    property = await Property.findById(propertyId);
+  } catch (err) {
+    const error = new HttpError(
+      "Something went wrong, could not find a property.",
+      500
+    );
+    return next(error);
   }
 
-  //response to the request. In this case {property} == {property: property}
-  res.json({ property });
+  //returns error in case no property was found
+  if (!property) {
+    const error = new HttpError(
+      "Could not find a property for the provided id.",
+      404
+    );
+    return next(error);
+  }
+
+  //response to the request. Covert [property] to JavaScript object. {getters: true} removes the underscore from the id
+  res.json({ property: property.toObject({ getters: true }) });
 };
 
 //Get property by user id
@@ -100,17 +116,28 @@ const createProperty = async (req, res, next) => {
     return next(error);
   }
 
-  const createdProperty = {
-    id: uuid.v4(),
+  const createdProperty = new Property({
     title, //When same name: (title == title: title)
     description,
-    location: coordinates,
     address,
+    location: coordinates,
+    image:
+      "https://images.pexels.com/photos/614810/pexels-photo-614810.jpeg?auto=compress&cs=tinysrgb&dpr=3&h=750&w=1260/",
     creator,
-  };
+  });
 
-  //adding the new property to the database
-  DUMMY_PROPERTIES.push(createdProperty);
+  //try to add new property to the database with the async method [save()]. Catch and display error if fail
+  try {
+    await createdProperty.save();
+  } catch (err) {
+    const error = new HttpError(
+      "Creating new property failed, please try again.",
+      500
+    );
+    return next(error);
+  }
+  //adding the new property to the database with the async method [save()]
+  await createdProperty.save();
 
   //response to the request. In this case {property} == {property: property}
   res.status(201).json({ property: createdProperty });
