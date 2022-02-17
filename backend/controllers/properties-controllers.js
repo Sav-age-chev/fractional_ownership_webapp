@@ -3,7 +3,7 @@
  */
 
 //import libraries
-const uuid = require("uuid");
+const uuid = require("uuid"); // -----> D E L E T E   M E   A T   S O M E   P O I N T ! <-----
 const { validationResult } = require("express-validator");
 
 //local imports
@@ -11,7 +11,7 @@ const HttpError = require("../models/http-error");
 const getCoordsForAddress = require("../util/location");
 const Property = require("../models/property");
 
-//dummy data to use while don't have database
+//dummy data to use while don't have database   -----> D E L E T E   M E   A T   S O M E   P O I N T ! <-----
 let DUMMY_PROPERTIES = [
   {
     id: "p1",
@@ -46,12 +46,36 @@ let DUMMY_PROPERTIES = [
   },
 ];
 
+//--------------------FOW-------------------------
+// //get all properties
+// const getProperties = async (req, res, next) => {
+//   //instantiating new variable with scope of the object
+//   let properties;
+//   //fetching all properties excluding their [creator] field. Return error if method fails
+//   try {
+//     properties = await Property.find({}, "-creator");
+//   } catch (err) {
+//     const error = new HttpError(
+//       "Something went wrong, please try again later",
+//       404
+//     );
+//     return next(error);
+//   }
+//   //as the return is an array need to use map to convert to JavaScript objects
+//   res.json({
+//     properties: properties.map((property) => property.toObject({ getters: true })),
+//   });
+// };
+//--------------------FOW-------------------------
+
 //get property by id. Asynchronous task
 const getPropertyById = async (req, res, next) => {
   //get the property by comparing id from url against database
   const propertyId = req.params.pid;
 
+  //instantiating new variable with a scope of the method
   let property;
+
   //try to get property by id from database with an asynchronous method. Catch and display error if fail
   try {
     //get the property from the database
@@ -78,12 +102,24 @@ const getPropertyById = async (req, res, next) => {
 };
 
 //Get property by user id
-const getPropertiesByUserId = (req, res, next) => {
-  //get the properties by comparing id from url against database
+const getPropertiesByUserId = async (req, res, next) => {
+  //get the user id from the url
   const userId = req.params.uid;
-  const properties = DUMMY_PROPERTIES.filter((p) => {
-    return p.creator === userId;
-  });
+
+  //instantiating new variable with a scope of the method
+  let properties;
+
+  //get the properties by comparing user id from url against database creator field. Returns error if fail
+  try {
+    properties = await Property.find({ creator: userId }); //TODO: add an owner field to the database and create similar method
+  } catch (err) {
+    const error = new HttpError(
+      "Fetching properties failed, please try again later.",
+      500
+    );
+    return next(error);
+  }
+
   //returns error in case no properties was found
   if (!properties || properties.length === 0) {
     return next(
@@ -91,8 +127,12 @@ const getPropertiesByUserId = (req, res, next) => {
     );
   }
 
-  //response to the request. In this case {properties} == {properties: properties}
-  res.json({ properties });
+  //response to the request. Using [map] as we browse trough an array. Then covert to JavaScript object and activate the getters to get rid of the underscore
+  res.json({
+    properties: properties.map((property) =>
+      property.toObject({ getters: true })
+    ),
+  });
 };
 
 //create new property
@@ -116,6 +156,7 @@ const createProperty = async (req, res, next) => {
     return next(error);
   }
 
+  //instantiating new object using the blueprint from models
   const createdProperty = new Property({
     title, //When same name: (title == title: title)
     description,
@@ -144,11 +185,13 @@ const createProperty = async (req, res, next) => {
 };
 
 //update existing property
-const updateProperty = (req, res, next) => {
+const updateProperty = async (req, res, next) => {
   //check validation results and return error in case is not empty
   const errors = validationResult(req);
   if (!errors.isEmpty()) {
-    throw new HttpError("Invalid inputs passed, please check your data.", 422);
+    return next(
+      new HttpError("Invalid inputs passed, please check your data.", 422)
+    );
   }
 
   //get data from the body
@@ -156,31 +199,68 @@ const updateProperty = (req, res, next) => {
   //get id from the url
   const propertyId = req.params.pid;
 
-  //creates a copy of the property
-  const updatedProperty = {
-    ...DUMMY_PROPERTIES.find((p) => p.id === propertyId),
-  };
-  //get the index from the array for the selected property
-  const propertyIndex = DUMMY_PROPERTIES.findIndex((p) => p.id === propertyId);
+  //instantiating new variable with a scope of the method
+  let property;
+
+  //try to get property by id from database with an asynchronous method. Catch and displays error if it fail
+  try {
+    property = await Property.findById(propertyId);
+  } catch (err) {
+    const error = new HttpError(
+      "Something went wrong, could not update property.",
+      500
+    );
+    return next(error);
+  }
+
   //updating details
-  updatedProperty.title = title;
-  updatedProperty.description = description;
-  //replacing the old with the new property
-  DUMMY_PROPERTIES[propertyIndex] = updatedProperty;
-  //response to the request
-  res.status(200).json({ property: updatedProperty });
+  property.title = title;
+  property.description = description;
+
+  //try to save the newly updated property into the database with asynchronous method. Catch and displays error if it fails
+  try {
+    await property.save();
+  } catch (err) {
+    const error = new HttpError(
+      "Something went wrong, could not update property",
+      500
+    );
+    return next(error);
+  }
+
+  //response to the request. Covert [property] to JavaScript object. {getters: true} removes the underscore from the id
+  res.status(200).json({ property: property.toObject({ getters: true }) });
 };
 
 //delete existing property
-const deleteProperty = (req, res, next) => {
+const deleteProperty = async (req, res, next) => {
   //get id from the url
   const propertyId = req.params.pid;
-  //check if the property exist in the database
-  if (!DUMMY_PROPERTIES.find((p) => p.id === propertyId)) {
-    throw new HttpError("Could not find the property", 404);
+
+  //instantiating new variable with a scope of the method
+  let property;
+
+  //try to get property by id from database with an asynchronous method. Catch and displays error if it fail
+  try {
+    property = await Property.findById(propertyId);
+  } catch (err) {
+    const error = new HttpError(
+      "Something went wrong, could not delete property.",
+      500
+    );
+    return next(error);
   }
-  //creating new array that replacing the old one once the loop completes. It keeps all entries but the match
-  DUMMY_PROPERTIES = DUMMY_PROPERTIES.filter((p) => p.id !== propertyId);
+
+  //try to delete property from database with an asynchronous method. Catch and displays error if it fail
+  try {
+    await property.remove();
+  } catch (err) {
+    const error = new HttpError(
+      "Something went wrong, could not delete property.",
+      500
+    );
+  }
+
   //response to the request
   res.status(200).json({ message: "Property deleted." });
 };

@@ -3,13 +3,14 @@
  */
 
 //import libraries
-const uuid = require("uuid");
+const uuid = require("uuid"); // -----> D E L E T E   M E   A T   S O M E   P O I N T ! <-----
 const { validationResult } = require("express-validator");
 
 //local imports
 const HttpError = require("../models/http-error");
+const User = require("../models/user");
 
-//dummy data to use while don't have database
+//dummy data to use while don't have database    -----> D E L E T E   M E   A T   S O M E   P O I N T ! <-----
 const DUMMY_USERS = [
   {
     id: "u1",
@@ -20,56 +21,95 @@ const DUMMY_USERS = [
 ];
 
 //get users
-const getUsers = (req, res, next) => {
-  res.json({ users: DUMMY_USERS });
+const getUsers = async (req, res, next) => {
+  //instantiating new variable with scope of the object
+  let users;
+  //fetching all users excluding their [password] field. Return error if method fails
+  try {
+    users = await User.find({}, "-password");
+  } catch (err) {
+    const error = new HttpError(
+      "Something went wrong, please try again later",
+      404
+    );
+    return next(error);
+  }
+  //as the return is an array need to use map to convert to JavaScript objects
+  res.json({ users: users.map((user) => user.toObject({ getters: true })) });
 };
 
 //signup user
-const signup = (req, res, next) => {
+const signup = async (req, res, next) => {
   //check validation results and return error in case is not empty
   const errors = validationResult(req);
   if (!errors.isEmpty()) {
-    throw new HttpError("Invalid inputs passed, please check your data.", 422);
+    return next(
+      new HttpError("Invalid inputs passed, please check your data.", 422)
+    );
   }
 
   //get data from the body
-  const { name, email, password } = req.body;
+  const { name, email, password, properties } = req.body;
 
-  //check if user already exists
-  const hasUser = DUMMY_USERS.find((u) => u.email === email);
-  if (hasUser) {
-    throw new HttpError("Could not create user, email already exists!", 422);
+  //instantiating new variable with a scope of the method
+  let existingUser;
+
+  //trying to find user by an email with an asynchronous method. Catch and displays error if it fails
+  try {
+    existingUser = await User.findOne({ email: email });
+  } catch (err) {
+    const error = new HttpError("Signing up failed, please try again.", 500);
+    return next(error);
   }
 
-  //create new user
-  const createdUser = {
-    id: uuid.v4(),
+  //returns error message if user with the given email exist
+  if (existingUser) {
+    const error = new HttpError("User already exists, please login.", 422);
+    return next(error);
+  }
+
+  //instantiating new object using the blueprint from models
+  const createdUser = new User({
     name, //When same name: (name == name: name)
     email,
+    image:
+      "https://images.pexels.com/photos/614810/pexels-photo-614810.jpeg?auto=compress&cs=tinysrgb&dpr=3&h=750&w=1260/",
     password,
-  };
+    properties,
+  });
 
-  //add the new user to the array list
-  DUMMY_USERS.push(createdUser);
+  //add the new user to the database with async function. Returns error if fail
+  try {
+    await createdUser.save();
+  } catch (err) {
+    const error = new HttpError("Signing up failed, please try again", 500);
+    return next(error);
+  }
 
   //response to the request
-  res.status(201).json({ user: createdUser });
+  res.status(201).json({ user: createdUser.toObject({ getters: true }) });
 };
 
 //login user
-const login = (req, res, next) => {
+const login = async (req, res, next) => {
   //get data from the body
   const { email, password } = req.body;
 
-  //get user if one exist with the given email
-  const identifiedUser = DUMMY_USERS.find((u) => u.email === email);
+  //instantiating new variable with a scope of the method
+  let existingUser;
 
-  //otherwise throw error
-  if (!identifiedUser || identifiedUser.password !== password) {
-    throw new HttpError(
-      "Credential not recognized. Please check entries or register!",
-      401
-    );
+  //trying to find user by an email with an asynchronous method. Catch and displays error if it fails
+  try {
+    existingUser = await User.findOne({ email: email });
+  } catch (err) {
+    const error = new HttpError("Logging in failed, please try again.", 500);
+    return next(error);
+  }
+
+  //returns error if the credential are invalid
+  if (!existingUser || existingUser.password !== password) {
+    const error = new HttpError("Invalid credential, please try again.", 401);
+    return next(error);
   }
 
   //response to the request

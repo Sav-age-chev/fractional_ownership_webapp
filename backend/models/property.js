@@ -1,5 +1,5 @@
 /*
- * [property.js] is a blueprint of the property model that we want to store in the database
+ * [property.js] is a blueprint of the property that we want to store in the database
  */
 
 //import libraries
@@ -21,5 +21,5 @@ const propertySchema = new Schema({
   creator: { type: String, required: true },
 });
 
-//exporting functions
-module.exports = mongoose.model('Property', propertySchema);
+//export model
+module.exports = mongoose.model("Property", propertySchema);
