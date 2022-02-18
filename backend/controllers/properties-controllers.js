@@ -3,48 +3,15 @@
  */
 
 //import libraries
-const uuid = require("uuid"); // -----> D E L E T E   M E   A T   S O M E   P O I N T ! <-----
+//const uuid = require("uuid"); //generates IDs -----> D E L E T E   M E   A T   S O M E   P O I N T ! <-----
 const { validationResult } = require("express-validator");
+const mongoose = require("mongoose");
 
 //local imports
 const HttpError = require("../models/http-error");
 const getCoordsForAddress = require("../util/location");
 const Property = require("../models/property");
-
-//dummy data to use while don't have database   -----> D E L E T E   M E   A T   S O M E   P O I N T ! <-----
-let DUMMY_PROPERTIES = [
-  {
-    id: "p1",
-    title: "1604 The Heart",
-    description:
-      "The development towers 24 floors and offers stunning views across Salford Quays.Designed to be shaped like a heart, some apartments have unique curved shapes and some offer balconies with some great water views. The Heart also has an onsite concierge and is only a 5 minute walk from MediaCity UK Metrolink stop providing 15-minute links to the city centre. Shops and restaurants are only 250m away, whilst Old Trafford, the home of Manchester United FC is only a 20 minute walk away. Book a viewing.",
-    //imageUrl: 'https://upload.wikimedia.org/wikipedia/commons/thumb/d/df/NYC_Empire_State_Building,jpg/640px-NYC_Empire_State_Building.jpg',
-    imageUrl:
-      "https://c7.alamy.com/comp/CCCC9M/media-city-footbridge-and-studios-at-mediacityuk-at-night-salford-CCCC9M.jpg",
-    location: {
-      lat: 53.4721254,
-      lng: -2.3026691,
-    },
-    address: "Blue Media City, Salford, United Kingdom M50 2TH",
-    creator: "u1",
-  },
-  {
-    id: "p2",
-    title: "Empire State Building",
-    description:
-      'The Empire State Building is a 102-story Art Deco skyscraper in Midtown Manhattan in New York City, United States. It was designed by Shreve, Lamb & Harmon and built from 1930 to 1931. Its name is derived from "Empire State", the nickname of the state of New York.',
-    //imageUrl: 'https://upload.wikimedia.org/wikipedia/commons/thumb/d/df/NYC_Empire_State_Building,jpg/640px-NYC_Empire_State_Building.jpg',
-    imageUrl:
-      "https://images.pexels.com/photos/614810/pexels-photo-614810.jpeg?auto=compress&cs=tinysrgb&dpr=3&h=750&w=1260/",
-    address: "20 W 34th St, New York, NY 10001, United States",
-    location: {
-      lat: 40.7484405,
-      lng: -73.9878531,
-    },
-    address: "20 W 34th St, New York, NY 10001, United States",
-    creator: "u2",
-  },
-];
+const User = require("../models/user");
 
 //--------------------FOW-------------------------
 // //get all properties
@@ -107,11 +74,13 @@ const getPropertiesByUserId = async (req, res, next) => {
   const userId = req.params.uid;
 
   //instantiating new variable with a scope of the method
-  let properties;
+  let userWithProperties;
+  // ALTERNATIVE: let properties;
 
   //get the properties by comparing user id from url against database creator field. Returns error if fail
   try {
-    properties = await Property.find({ creator: userId }); //TODO: add an owner field to the database and create similar method
+    userWithProperties = await User.findById(userId).populate("properties");
+    // ALTERNATIVE: properties = await Property.find({ creator: userId });
   } catch (err) {
     const error = new HttpError(
       "Fetching properties failed, please try again later.",
@@ -121,7 +90,8 @@ const getPropertiesByUserId = async (req, res, next) => {
   }
 
   //returns error in case no properties was found
-  if (!properties || properties.length === 0) {
+  if (!userWithProperties || userWithProperties.properties.length === 0) {
+    // ALTERNATIVE: if (!properties || properties.length === 0) {
     return next(
       new HttpError("Could not find properties for the provided user id.", 404)
     );
@@ -129,10 +99,15 @@ const getPropertiesByUserId = async (req, res, next) => {
 
   //response to the request. Using [map] as we browse trough an array. Then covert to JavaScript object and activate the getters to get rid of the underscore
   res.json({
-    properties: properties.map((property) =>
+    properties: userWithProperties.properties.map((property) =>
       property.toObject({ getters: true })
     ),
   });
+  //    ALTERNATIVE: res.json({
+  //     properties: properties.map((property) =>
+  //     property.toObject({ getters: true })
+  //   ),
+  // });
 };
 
 //create new property
@@ -165,11 +140,47 @@ const createProperty = async (req, res, next) => {
     image:
       "https://images.pexels.com/photos/614810/pexels-photo-614810.jpeg?auto=compress&cs=tinysrgb&dpr=3&h=750&w=1260/",
     creator,
+    //--------------------FOW-------------------------
+    // owners: [],
+    //--------------------FOW-------------------------
   });
 
-  //try to add new property to the database with the async method [save()]. Catch and display error if fail
+  //check if the user id for creator exists
+  let user;
   try {
-    await createdProperty.save();
+    user = await User.findById(creator);
+  } catch (err) {
+    const error = new HttpError(
+      "Creating place failed, please try again.",
+      500
+    );
+    return next(error);
+  }
+
+  //check if user has been retrieved
+  if (!user) {
+    const error = new HttpError(
+      "Could not find user with the provided id",
+      404
+    );
+    return next(error);
+  }
+
+  //try to add new property to the database with the async method [save()]. Catch and display error if fail
+  // NOTE: if we dont have collection [properties], will have to created manually !!!
+  try {
+    //starting session
+    const sess = await mongoose.startSession();
+    //starting a transaction
+    sess.startTransaction();
+    //saves the property
+    await createdProperty.save({ session: sess });
+    //adding the property id to the user
+    user.properties.push(createdProperty);
+    //saves the user
+    await user.save({ session: sess });
+    //session commits the transaction if all previous commands has been executed successfully
+    await sess.commitTransaction();
   } catch (err) {
     const error = new HttpError(
       "Creating new property failed, please try again.",
@@ -177,8 +188,27 @@ const createProperty = async (req, res, next) => {
     );
     return next(error);
   }
-  //adding the new property to the database with the async method [save()]
-  await createdProperty.save();
+
+  // //--------------------FOW-------------------------
+  // //should be in a new method called [buyProperty]
+  // //check if the user id for owner exists
+  // let userOwner;
+  // try {
+  //   userOwner = User.findById(owner);
+  // } catch (err) {
+  //   const error = new HttpError(
+  //     'Creating place failed, please try again.', 500
+  //   );
+  //   return next(error);
+  // }
+
+  // //check if user has been retrieved
+  // if (!userOwner) {
+  //   const error = new HttpError('Could not find user with the provided id', 404);
+  //   return next(error);
+  // }
+
+  // //--------------------FOW-------------------------
 
   //response to the request. In this case {property} == {property: property}
   res.status(201).json({ property: createdProperty });
@@ -242,7 +272,7 @@ const deleteProperty = async (req, res, next) => {
 
   //try to get property by id from database with an asynchronous method. Catch and displays error if it fail
   try {
-    property = await Property.findById(propertyId);
+    property = await Property.findById(propertyId).populate("creator");
   } catch (err) {
     const error = new HttpError(
       "Something went wrong, could not delete property.",
@@ -251,9 +281,29 @@ const deleteProperty = async (req, res, next) => {
     return next(error);
   }
 
+  //check if property exist
+  if (!property) {
+    const error = new HttpError(
+      "Could not find property for the provided id",
+      404
+    );
+    return next(error);
+  }
+
   //try to delete property from database with an asynchronous method. Catch and displays error if it fail
   try {
-    await property.remove();
+    //starting new session
+    const sess = await mongoose.startSession();
+    //starting a transaction
+    sess.startTransaction();
+    //remove property
+    await property.remove({ session: sess });
+    //remove property from the user array
+    property.creator.properties.pull(property);
+    //saves the update
+    await property.creator.save({ session: sess });
+    //commit the transaction
+    await sess.commitTransaction();
   } catch (err) {
     const error = new HttpError(
       "Something went wrong, could not delete property.",

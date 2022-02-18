@@ -4,22 +4,31 @@
 
 //import libraries
 const mongoose = require("mongoose");
-const uniqueValidator = require('mongoose-unique-validator');
+const uniqueValidator = require("mongoose-unique-validator");
 
 //instantiating Schema constant
 const Schema = mongoose.Schema;
 
 //user blueprint
 const userSchema = new Schema({
-    name: { type: String, required: true },
-    email: { type: String, required: true, unique: true },
-    password: { type: String, required: true, minlength: 6 },
-    image: { type: String, required: true },
-    properties: { type: String, required: true },
+  name: { type: String, required: true },
+  email: { type: String, required: true, unique: true },
+  password: { type: String, required: true, minlength: 6 },
+  image: { type: String, required: true },
+  properties: [
+    {
+      type: mongoose.Types.ObjectId,
+      required: true,
+      ref: "Property",
+    },
+  ],
+  //-------------------------FOW----------------------------
+  //share: [{ type: mongoose.Types.ObjectId, required: true, ref: 'Share' }]
+  //-------------------------FOW----------------------------
 });
 
 //add the unique validator to the schema
 userSchema.plugin(uniqueValidator);
 
 //export model
-module.exports = mongoose.model('User', userSchema);
+module.exports = mongoose.model("User", userSchema);

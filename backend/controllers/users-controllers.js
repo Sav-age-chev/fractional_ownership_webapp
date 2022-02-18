@@ -3,22 +3,11 @@
  */
 
 //import libraries
-const uuid = require("uuid"); // -----> D E L E T E   M E   A T   S O M E   P O I N T ! <-----
 const { validationResult } = require("express-validator");
 
 //local imports
 const HttpError = require("../models/http-error");
 const User = require("../models/user");
-
-//dummy data to use while don't have database    -----> D E L E T E   M E   A T   S O M E   P O I N T ! <-----
-const DUMMY_USERS = [
-  {
-    id: "u1",
-    name: "Plamen Savchev",
-    email: "test@test.com",
-    password: "tester",
-  },
-];
 
 //get users
 const getUsers = async (req, res, next) => {
@@ -49,7 +38,7 @@ const signup = async (req, res, next) => {
   }
 
   //get data from the body
-  const { name, email, password, properties } = req.body;
+  const { name, email, password } = req.body;
 
   //instantiating new variable with a scope of the method
   let existingUser;
@@ -75,7 +64,7 @@ const signup = async (req, res, next) => {
     image:
       "https://images.pexels.com/photos/614810/pexels-photo-614810.jpeg?auto=compress&cs=tinysrgb&dpr=3&h=750&w=1260/",
     password,
-    properties,
+    properties: [],
   });
 
   //add the new user to the database with async function. Returns error if fail
