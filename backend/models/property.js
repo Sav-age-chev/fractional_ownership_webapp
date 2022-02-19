@@ -20,8 +20,9 @@ const propertySchema = new Schema({
   },
   creator: { type: mongoose.Types.ObjectId, required: true, ref: "User" },
   //-------------------------FOW----------------------------
-  //owners: [{ type: mongoose.Types.ObjectId, required: true, ref: 'User' }]
-  //price: { type: Number, required: true },
+  owners: [{ type: mongoose.Types.ObjectId, required: false, ref: "User" }],
+  price: { type: Number, required: true },
+  availableShares: { type: Number, required: true },                //TODO: need validation: should be smaller or equal to the price :)
   //-------------------------FOW----------------------------
 });
 

@@ -65,6 +65,7 @@ const signup = async (req, res, next) => {
       "https://images.pexels.com/photos/614810/pexels-photo-614810.jpeg?auto=compress&cs=tinysrgb&dpr=3&h=750&w=1260/",
     password,
     properties: [],
+    shares: [],
   });
 
   //add the new user to the database with async function. Returns error if fail

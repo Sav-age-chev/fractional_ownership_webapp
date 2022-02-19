@@ -23,7 +23,7 @@ const userSchema = new Schema({
     },
   ],
   //-------------------------FOW----------------------------
-  //share: [{ type: mongoose.Types.ObjectId, required: true, ref: 'Share' }]
+  shares: [{ type: mongoose.Types.ObjectId, required: true, ref: 'Share' }]
   //-------------------------FOW----------------------------
 });
 

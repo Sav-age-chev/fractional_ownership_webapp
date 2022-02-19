@@ -12,7 +12,7 @@ const Schema = mongoose.Schema;
 
 //user blueprint
 const shareSchema = new Schema({
-  owners: { type: mongoose.Types.ObjectId, required: true, ref: "User" },
+  user: { type: mongoose.Types.ObjectId, required: true, ref: "User" },
   properties: {
     type: mongoose.Types.ObjectId,
     required: true,
@@ -22,6 +22,6 @@ const shareSchema = new Schema({
 });
 
 //export model
-module.exports = mongoose.model("Share", userSchema);
+module.exports = mongoose.model("Share", shareSchema);
 
 //---------------------------------FOW--------------------------------------

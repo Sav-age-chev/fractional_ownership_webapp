@@ -12,6 +12,7 @@ const HttpError = require("../models/http-error");
 const getCoordsForAddress = require("../util/location");
 const Property = require("../models/property");
 const User = require("../models/user");
+const Share = require("../models/share");
 
 //--------------------FOW-------------------------
 // //get all properties
@@ -121,7 +122,7 @@ const createProperty = async (req, res, next) => {
   }
 
   //object destructuring
-  const { title, description, address, creator } = req.body;
+  const { title, description, address, creator, price, availableShares } = req.body;
 
   //convert address to coordinates
   let coordinates;
@@ -130,6 +131,8 @@ const createProperty = async (req, res, next) => {
   } catch (error) {
     return next(error);
   }
+
+  console.log(creator);    // <----------------------- DELETE ME ! --------------------------
 
   //instantiating new object using the blueprint from models
   const createdProperty = new Property({
@@ -141,9 +144,13 @@ const createProperty = async (req, res, next) => {
       "https://images.pexels.com/photos/614810/pexels-photo-614810.jpeg?auto=compress&cs=tinysrgb&dpr=3&h=750&w=1260/",
     creator,
     //--------------------FOW-------------------------
-    // owners: [],
+     owners: [],
+     price,
+     availableShares,
     //--------------------FOW-------------------------
   });
+
+  console.log(createdProperty);    // <----------------------- DELETE ME ! --------------------------
 
   //check if the user id for creator exists
   let user;
@@ -189,30 +196,133 @@ const createProperty = async (req, res, next) => {
     return next(error);
   }
 
-  // //--------------------FOW-------------------------
-  // //should be in a new method called [buyProperty]
-  // //check if the user id for owner exists
-  // let userOwner;
-  // try {
-  //   userOwner = User.findById(owner);
-  // } catch (err) {
-  //   const error = new HttpError(
-  //     'Creating place failed, please try again.', 500
-  //   );
-  //   return next(error);
-  // }
-
-  // //check if user has been retrieved
-  // if (!userOwner) {
-  //   const error = new HttpError('Could not find user with the provided id', 404);
-  //   return next(error);
-  // }
-
-  // //--------------------FOW-------------------------
-
   //response to the request. In this case {property} == {property: property}
   res.status(201).json({ property: createdProperty });
 };
+
+//--------------------------------FOW----------------------------------------
+//update existing property
+const buyPropertyShare = async (req, res, next) => {
+  //check validation results and return error in case is not empty
+  const errors = validationResult(req);
+  if (!errors.isEmpty()) {
+    return next(
+      new HttpError("Invalid inputs passed, please check your data.", 422)
+    );
+  }
+
+  //get data from the body
+  const { owner, estate, share } = req.body;
+  //get id from the url
+  const propertyId = req.params.pid;
+  const userId = req.params.uid;
+
+  console.log(propertyId);    // <----------------------- DELETE ME ! --------------------------
+  console.log(userId);    // <----------------------- DELETE ME ! --------------------------
+
+  //instantiating new object using the blueprint from models
+  const createdShare = new Share({
+    owner,
+    estate,
+    share,
+  });
+
+  //instantiating new variable with a scope of the method
+  let property;
+
+  //try to get property by id from database with an asynchronous method. Catch and displays error if it fail
+  try {
+    property = await Property.findById(estate);
+  } catch (err) {
+    const error = new HttpError(
+      "Something went wrong, could not update property.",
+      500
+    );
+    return next(error);
+  }
+
+  if (!property) {
+    return next(
+      new HttpError("Could not find the property. Please try again.", 404)
+    );
+  } else if (property.availableShares == 0.0) {
+    return next(
+      new HttpError(
+        "There are not available shares for this property at the moment. Please try again later.",
+        422
+      )
+    );
+  } else if (property.availableShares < share) {
+    return next(
+      new HttpError(
+        "Not enough available shares, please choose lower value.",
+        422
+      )
+    );
+  } else {
+    property.availableShares -= share;
+  }
+
+  //check if the user id for exists
+  let user;
+  try {
+    user = User.findById(owner);
+  } catch (err) {
+    const error = new HttpError("Buying shares failed, please try again.", 500);
+    return next(error);
+  }
+
+  //check if user has been retrieved
+  if (!user) {
+    const error = new HttpError(
+      "Could not find user with the provided id",
+      404
+    );
+    return next(error);
+  }
+
+  console.log(createdShare);    // <----------------------- DELETE ME ! --------------------------
+
+  try {
+    //starting session
+    const sess = await mongoose.startSession();
+    //starting a transaction
+    sess.startTransaction();
+    //saves the property
+    await createdShare.save({ session: sess });
+    //adding the property id to the user
+    property.owners.push(user);
+    //saves the property
+    await property.save({ session: sess });
+    //adding the property id to the user
+    user.shares.push(createdShare);
+    //saves the user
+    await user.save({ session: sess });
+    //session commits the transaction if all previous commands has been executed successfully
+    await sess.commitTransaction();
+  } catch (err) {
+    const error = new HttpError(
+      "Creating new property failed, please try again.",
+      500
+    );
+    return next(error);
+  }
+
+  //try to save the newly updated property into the database with asynchronous method. Catch and displays error if it fails
+  try {
+    await property.save();
+  } catch (err) {
+    const error = new HttpError(
+      "Something went wrong, could not update property",
+      500
+    );
+    return next(error);
+  }
+
+  //response to the request. Covert [property] to JavaScript object. {getters: true} removes the underscore from the id
+  res.status(200).json({ property: property.toObject({ getters: true }) });
+};
+//--------------------------------FOW----------------------------------------
 
 //update existing property
 const updateProperty = async (req, res, next) => {
@@ -321,3 +431,7 @@ exports.getPropertiesByUserId = getPropertiesByUserId;
 exports.createProperty = createProperty;
 exports.updateProperty = updateProperty;
 exports.deleteProperty = deleteProperty;
+//--------------------------------FOW----------------------------------------
+exports.buyPropertyShare = buyPropertyShare;
+//exports.sellPropertyShare = sellPropertyShare;
+//--------------------------------FOW----------------------------------------
