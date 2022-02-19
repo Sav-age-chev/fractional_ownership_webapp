@@ -13,7 +13,7 @@ const Schema = mongoose.Schema;
 //user blueprint
 const shareSchema = new Schema({
   user: { type: mongoose.Types.ObjectId, required: true, ref: "User" },
-  properties: {
+  property: {
     type: mongoose.Types.ObjectId,
     required: true,
     ref: "Property",

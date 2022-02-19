@@ -122,7 +122,8 @@ const createProperty = async (req, res, next) => {
   }
 
   //object destructuring
-  const { title, description, address, creator, price, availableShares } = req.body;
+  const { title, description, address, creator, price, availableShares } =
+    req.body;
 
   //convert address to coordinates
   let coordinates;
@@ -132,7 +133,7 @@ const createProperty = async (req, res, next) => {
     return next(error);
   }
 
-  console.log(creator);    // <----------------------- DELETE ME ! --------------------------
+  console.log(creator); // <----------------------- DELETE ME ! --------------------------
 
   //instantiating new object using the blueprint from models
   const createdProperty = new Property({
@@ -144,13 +145,14 @@ const createProperty = async (req, res, next) => {
       "https://images.pexels.com/photos/614810/pexels-photo-614810.jpeg?auto=compress&cs=tinysrgb&dpr=3&h=750&w=1260/",
     creator,
     //--------------------FOW-------------------------
-     owners: [],
-     price,
-     availableShares,
+    //owners: [],   <----- OWNERS VERSION
+    shares: [],
+    price,
+    availableShares,
     //--------------------FOW-------------------------
   });
 
-  console.log(createdProperty);    // <----------------------- DELETE ME ! --------------------------
+  console.log(createdProperty); // <----------------------- DELETE ME ! --------------------------
 
   //check if the user id for creator exists
   let user;
@@ -201,7 +203,8 @@ const createProperty = async (req, res, next) => {
 };
 
 //--------------------------------FOW----------------------------------------
-//update existing property
+
+//buy property share
 const buyPropertyShare = async (req, res, next) => {
   //check validation results and return error in case is not empty
   const errors = validationResult(req);
@@ -212,27 +215,20 @@ const buyPropertyShare = async (req, res, next) => {
   }
 
   //get data from the body
-  const { owner, estate, share } = req.body;
+  const { share } = req.body;
   //get id from the url
   const propertyId = req.params.pid;
   const userId = req.params.uid;
 
-  console.log(propertyId);    // <----------------------- DELETE ME ! --------------------------
-  console.log(userId);    // <----------------------- DELETE ME ! --------------------------
-
-  //instantiating new object using the blueprint from models
-  const createdShare = new Share({
-    owner,
-    estate,
-    share,
-  });
+  console.log(propertyId); // <----------------------- DELETE ME ! --------------------------
+  console.log(userId); // <----------------------- DELETE ME ! --------------------------
 
   //instantiating new variable with a scope of the method
   let property;
 
   //try to get property by id from database with an asynchronous method. Catch and displays error if it fail
   try {
-    property = await Property.findById(estate);
+    property = await Property.findById(propertyId);
   } catch (err) {
     const error = new HttpError(
       "Something went wrong, could not update property.",
@@ -241,6 +237,7 @@ const buyPropertyShare = async (req, res, next) => {
     return next(error);
   }
 
+  //returns error if property variable is empty or there not enough available shares
   if (!property) {
     return next(
       new HttpError("Could not find the property. Please try again.", 404)
@@ -259,14 +256,12 @@ const buyPropertyShare = async (req, res, next) => {
         422
       )
     );
-  } else {
-    property.availableShares -= share;
   }
 
-  //check if the user id for exists
+  //check if the user id for the provided id exists
   let user;
   try {
-    user = User.findById(owner);
+    user = await User.findById(userId);
   } catch (err) {
     const error = new HttpError("Buying shares failed, please try again.", 500);
     return next(error);
@@ -281,20 +276,30 @@ const buyPropertyShare = async (req, res, next) => {
     return next(error);
   }
 
-  console.log(createdShare);    // <----------------------- DELETE ME ! --------------------------
+  //instantiating new object using the blueprint from models
+  const createdShare = new Share({
+    user,
+    property,
+    share,
+  });
+
+  console.log(createdShare); // <----------------------- DELETE ME ! --------------------------
 
   try {
     //starting session
     const sess = await mongoose.startSession();
     //starting a transaction
     sess.startTransaction();
-    //saves the property
+    //saves the share
     await createdShare.save({ session: sess });
-    //adding the property id to the user
-    property.owners.push(user);
+    //updating the available shares 
+    property.availableShares -= share;
+    //adding the share to the property shares array
+    //property.owners.push(user);   <----- OWNERS VERSION
+    property.shares.push(createdShare);
     //saves the property
     await property.save({ session: sess });
-    //adding the property id to the user
+    //adding the share to the user shares array
     user.shares.push(createdShare);
     //saves the user
     await user.save({ session: sess });
@@ -308,20 +313,95 @@ const buyPropertyShare = async (req, res, next) => {
     return next(error);
   }
 
-  //try to save the newly updated property into the database with asynchronous method. Catch and displays error if it fails
+  //response to the request. Covert [property] to JavaScript object. {getters: true} removes the underscore from the id
+  res.status(200).json({ share: createdShare });
+};
+
+//sell property share
+const sellPropertyShare = async (req, res, next) => {
+  //get id from the url
+  const shareId = req.params.sid;
+
+  //instantiating new variable with a scope of the method
+  let share;
+
+  //try to get property by id from database with an asynchronous method. Catch and displays error if it fail
   try {
-    await property.save();
+    share = await Share.findById(shareId).populate("user property");
   } catch (err) {
     const error = new HttpError(
-      "Something went wrong, could not update property",
+      "Something went wrong, could not sell your share.",
       500
     );
     return next(error);
   }
 
-  //response to the request. Covert [property] to JavaScript object. {getters: true} removes the underscore from the id
-  res.status(200).json({ property: property.toObject({ getters: true }) });
+  console.log(share); // <----------------------- DELETE ME ! --------------------------
+
+  //check if property exist
+  if (!share) {
+    const error = new HttpError(
+      "Could not find share for the provided id",
+      404
+    );
+    return next(error);
+  }
+
+  // //instantiating new variable with a scope of the method
+  // let property;
+
+  // //try to get property by id from database with an asynchronous method. Catch and displays error if it fail
+  // try {
+  //   property = await Property.findById(propertyId);
+  // } catch (err) {
+  //   const error = new HttpError(
+  //     "Something went wrong, could not delete property.",
+  //     500
+  //   );
+  //   return next(error);
+  // }
+
+  // //check if property has been retrieved
+  // if (!property) {
+  //   const error = new HttpError(
+  //     "Could not find property for the provided id",
+  //     404
+  //   );
+  //   return next(error);
+  // }
+
+  //try to delete property from database with an asynchronous method. Catch and displays error if it fail
+  try {
+    //starting new session
+    const sess = await mongoose.startSession();
+    //starting a transaction
+    sess.startTransaction();
+    //adding back shares to the property available shares
+    share.property.availableShares += share.share;
+    //remove property from the user array
+    //share.property.owners.pull(share.user);    //owner update
+    share.property.shares.pull(share);
+    //saves the update
+    await share.property.save({ session: sess });
+    //remove property from the user array
+    share.user.shares.pull(share);
+    //saves the update
+    await share.user.save({ session: sess });
+    //remove property
+    await share.remove({ session: sess });
+    //commit the transaction
+    await sess.commitTransaction();
+  } catch (err) {
+    const error = new HttpError(
+      "Something went wrong, could not delete property.",
+      500
+    );
+  }
+
+  //response to the request
+  res.status(200).json({ message: "Share sold." });
 };
+
 //--------------------------------FOW----------------------------------------
 
 //update existing property
@@ -391,7 +471,7 @@ const deleteProperty = async (req, res, next) => {
     return next(error);
   }
 
-  //check if property exist
+  //check if property has been retrieved
   if (!property) {
     const error = new HttpError(
       "Could not find property for the provided id",
@@ -433,5 +513,5 @@ exports.updateProperty = updateProperty;
 exports.deleteProperty = deleteProperty;
 //--------------------------------FOW----------------------------------------
 exports.buyPropertyShare = buyPropertyShare;
-//exports.sellPropertyShare = sellPropertyShare;
+exports.sellPropertyShare = sellPropertyShare;
 //--------------------------------FOW----------------------------------------
