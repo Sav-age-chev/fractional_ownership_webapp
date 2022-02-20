@@ -12,8 +12,6 @@ const propertiesControllers = require("../controllers/properties-controllers");
 //instantiating [router] object
 const router = express.Router();
 
-//Dummy data to use while don't have database //TODO: Double check if you should have dummy data here
-
 //get property by property id. Uses pointer to a function and not executing it ()
 router.get("/:pid", propertiesControllers.getPropertyById);
 
@@ -32,15 +30,14 @@ router.post(
 );
 
 //--------------------------------FOW----------------------------------------
-//buy share of a property. Uses pointer to a function and not executing it ()
-router.post(
-  "/share/:pid/:uid",
-  [check("share").not().isEmpty(), check("share").isNumeric()],
-  propertiesControllers.buyPropertyShare
-);
+// //buy share of a property. Uses pointer to a function and not executing it ()
+// router.post("/share/:pid/:uid", [
+//   check("share").not().isEmpty(),
+//   check("share").isNumeric()
+// ], propertiesControllers.buyPropertyShare);
 
-//delete share of a property. Uses pointer to a function and not executing it ()
-router.delete("/share/sell/:sid", propertiesControllers.sellPropertyShare);
+// //delete share of a property. Uses pointer to a function and not executing it ()
+// router.delete("/share/sell/:sid", propertiesControllers.sellPropertyShare);
 //--------------------------------FOW----------------------------------------
 
 //edit existing property. First execute methods to validate the input and then uses pointer to a function and not executing it ()

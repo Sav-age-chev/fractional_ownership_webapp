@@ -11,6 +11,7 @@ const mongoose = require("mongoose");
 //local imports
 const propertiesRoutes = require("./routes/properties-routes");
 const usersRoutes = require("./routes/users-routes");
+const sharesRoutes = require("./routes/shares-routes");
 const HttpError = require("./models/http-error");
 
 //instantiating [app] object(server)
@@ -25,6 +26,7 @@ app.use(bodyParser.json());
 
 app.use("/api/properties", propertiesRoutes);
 app.use("/api/users", usersRoutes);
+app.use("/api/shares", sharesRoutes);
 
 //Handling all unspecified routes. It is called if there was no respond from the previous methods
 app.use((req, res, next) => {

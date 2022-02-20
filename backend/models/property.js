@@ -20,7 +20,7 @@ const propertySchema = new Schema({
   },
   creator: { type: mongoose.Types.ObjectId, required: true, ref: "User" },
   //-------------------------FOW----------------------------
-  shares: [{ type: mongoose.Types.ObjectId, required: false, ref: "Share" }],
+  propertyShares: [{ type: mongoose.Types.ObjectId, required: true, ref: "Share" }],
   //owners: [{ type: mongoose.Types.ObjectId, required: false, ref: "Share" }],
   price: { type: Number, required: true },
   availableShares: { type: Number, required: true },

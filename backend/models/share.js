@@ -1,5 +1,3 @@
-//---------------------------------FOW--------------------------------------
-
 /*
  * [share.js] is a blueprint of the shares user own from certain property that we want to store in the database
  */
@@ -12,8 +10,8 @@ const Schema = mongoose.Schema;
 
 //user blueprint
 const shareSchema = new Schema({
-  user: { type: mongoose.Types.ObjectId, required: true, ref: "User" },
-  property: {
+  owner: { type: mongoose.Types.ObjectId, required: true, ref: "User" },
+  shareProperty: {
     type: mongoose.Types.ObjectId,
     required: true,
     ref: "Property",
@@ -23,5 +21,3 @@ const shareSchema = new Schema({
 
 //export model
 module.exports = mongoose.model("Share", shareSchema);
-
-//---------------------------------FOW--------------------------------------
