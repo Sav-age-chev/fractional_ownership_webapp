@@ -29,17 +29,6 @@ router.post(
   propertiesControllers.createProperty
 );
 
-//--------------------------------FOW----------------------------------------
-// //buy share of a property. Uses pointer to a function and not executing it ()
-// router.post("/share/:pid/:uid", [
-//   check("share").not().isEmpty(),
-//   check("share").isNumeric()
-// ], propertiesControllers.buyPropertyShare);
-
-// //delete share of a property. Uses pointer to a function and not executing it ()
-// router.delete("/share/sell/:sid", propertiesControllers.sellPropertyShare);
-//--------------------------------FOW----------------------------------------
-
 //edit existing property. First execute methods to validate the input and then uses pointer to a function and not executing it ()
 router.patch(
   "/:pid",
