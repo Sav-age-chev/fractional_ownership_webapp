@@ -514,3 +514,7 @@ exports.getPropertiesByUserId = getPropertiesByUserId;
 exports.createProperty = createProperty;
 exports.updateProperty = updateProperty;
 exports.deleteProperty = deleteProperty;
+//--------------------------------FOW----------------------------------------
+// exports.buyPropertyShare = buyPropertyShare;
+// exports.sellPropertyShare = sellPropertyShare;
+//--------------------------------FOW----------------------------------------
