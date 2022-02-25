@@ -23,7 +23,7 @@ router.post("/buy/:pid", [
   check("share").not().isEmpty(),
   check("share").isNumeric()
 ], sharesControllers.buyPropertyShare);
-
+    
 //delete share of a property. Uses pointer to a function and not executing it ()
 router.delete("/sell/:sid", sharesControllers.sellPropertyShare);
 
