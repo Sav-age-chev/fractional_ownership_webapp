@@ -1,27 +1,37 @@
+/*
+ * [Auth.js] file is responsible for the user authentication
+ */
+
+//import libraries
 import React, { useState, useContext } from "react";
 
+//local imports
 import Card from "../../shared/components/UIElements/Card";
 import Input from "../../shared/components/FormElements/Input";
 import Button from "../../shared/components/FormElements/Button";
+import ErrorModal from "../../shared/components/UIElements/ErrorModal";
+import LoadingSpinner from "../../shared/components/UIElements/LoadingSpinner";
 import { useForm } from "../../shared/hooks/form-hook";
 import { AuthContext } from "../../shared/context/auth-context";
+import { useHttpClient } from "../../shared/hooks/http-hook";
 import {
   VALIDATOR_EMAIL,
   VALIDATOR_MINLENGTH,
   VALIDATOR_REQUIRE,
 } from "../../shared/util/validators";
 
+//styling sheet
 import "./Auth.css";
-
-/*
- * [Auth] page purpose is the user authentication
- */
 
 const Auth = () => {
   const auth = useContext(AuthContext);
-
+  //instantiating state
   const [isLoginMode, setIsLoginMode] = useState(true);
 
+  //call to the custom http hook prior to the request as provides pointers to multiple require values such as state. Object destructuring used
+  const { isLoading, error, sendRequest, clearError } = useHttpClient();
+
+  //login mode
   const [formState, inputHandler, setFormData] = useForm(
     {
       email: {
@@ -36,6 +46,7 @@ const Auth = () => {
     false
   );
 
+  //adding name field for signup mode
   const switchModeHandler = (event) => {
     if (!isLoginMode) {
       setFormData(
@@ -60,58 +71,111 @@ const Auth = () => {
     setIsLoginMode((prevMode) => !prevMode);
   };
 
-  const authSubmitHandler = (event) => {
+  //sending login/signup request with asynchronous method
+  const authSubmitHandler = async (event) => {
     event.preventDefault();
-    console.log(formState.inputs);
-    auth.login();
+
+    if (isLoginMode) {
+      //LOGIN
+
+      try {
+        //sending http request. [sendRequest] is a pointer to the function within the http hook and expects url, method, body & headers as arguments
+        await sendRequest(
+          /* URL */
+          "http://localhost:5000/api/users/login",
+          /* METHOD */
+          "POST",
+          /* body: the data. Converts JavaScript to JSON data */
+          JSON.stringify({
+            email: formState.inputs.email.value,
+            password: formState.inputs.password.value,
+          }),
+          /* headers: type of data */ {
+            "Content-Type": "application/json",
+          }
+        );
+
+        //login user
+        auth.login();
+      } catch (err) {}
+    } else {
+      //SIGNUP
+
+      try {
+        //sending http request. [sendRequest] is a pointer to the function within the http hook and expects url, method, body & headers as arguments
+        await sendRequest(
+          /* URL */
+          "http://localhost:5000/api/users/signup",
+          /* METHOD */
+          "POST",
+          /* body: the data. Converts JavaScript to JSON data */
+          JSON.stringify({
+            name: formState.inputs.name.value,
+            email: formState.inputs.email.value,
+            password: formState.inputs.password.value,
+          }),
+          /* headers: type of data */ {
+            "Content-Type": "application/json",
+          }
+        );
+
+        //login user
+        auth.login();
+      } catch (err) {}
+    }
   };
 
   return (
-    <Card className="authentication">
-      <h2>Login Required</h2>
-      <hr />
-      <form onSubmit={authSubmitHandler}>
-        {!isLoginMode && (
+    <React.Fragment>
+      <ErrorModal error={error} onClear={clearError} />
+      <Card className="authentication">
+        {isLoading && <LoadingSpinner asOverlay />}
+        <h2>Login Required</h2>
+        <hr />
+        <form onSubmit={authSubmitHandler}>
+          {!isLoginMode && (
+            <Input
+              element="input"
+              id="name"
+              type="text"
+              label="Your Name"
+              validators={[VALIDATOR_REQUIRE()]}
+              errorText="Please enter your name."
+              onInput={inputHandler}
+            />
+          )}
+
           <Input
             element="input"
-            id="name"
-            type="text"
-            label="Your Name"
-            validators={[VALIDATOR_REQUIRE()]}
-            errorText="Please enter your name."
+            id="email"
+            type="email"
+            label="E-Mail"
+            validators={[VALIDATOR_EMAIL()]}
+            errorText="Please enter a valid email address."
             onInput={inputHandler}
           />
-        )}
 
-        <Input
-          element="input"
-          id="email"
-          type="email"
-          label="E-Mail"
-          validators={[VALIDATOR_EMAIL()]}
-          errorText="Please enter a valid email address."
-          onInput={inputHandler}
-        />
+          <Input
+            element="input"
+            id="password"
+            type="password"
+            label="password"
+            validators={[VALIDATOR_MINLENGTH(5)]}
+            errorText="Please enter a valid password."
+            onInput={inputHandler}
+          />
 
-        <Input
-          element="input"
-          id="password"
-          type="password"
-          label="password"
-          validators={[VALIDATOR_MINLENGTH(5)]}
-          errorText="Please enter a valid password."
-          onInput={inputHandler}
-        />
-
-        <Button type="submit" disabled={!formState.isValid}>
-          {isLoginMode ? "LOGIN" : "SIGNUP"}
+          <Button type="submit" disabled={!formState.isValid}>
+            {isLoginMode ? "LOGIN" : "SIGNUP"}
+          </Button>
+        </form>
+        <Button inverse onClick={switchModeHandler}>
+          SWITCH TO {isLoginMode ? "SIGNUP" : "LOGIN"}
         </Button>
-      </form>
-      <Button inverse onClick={switchModeHandler}>
-        SWITCH TO {isLoginMode ? "SIGNUP" : "LOGIN"}
-      </Button>
-    </Card>
+      </Card>
+    </React.Fragment>
   );
 };
 
+//export component
 export default Auth;

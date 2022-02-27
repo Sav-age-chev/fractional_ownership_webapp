@@ -1,3 +1,9 @@
+/*
+ * [App.js] file is the root component and in a sense is the backbone of the app.
+ * All the requests are redirected from here to the right file/component
+ */
+
+//import libraries
 import React, { useState, useCallback } from "react";
 import {
   BrowserRouter as Router,
@@ -6,6 +12,7 @@ import {
   Switch,
 } from "react-router-dom";
 
+//local imports
 import Auth from "./user/pages/Auth";
 import Users from "./user/pages/Users";
 import NewProperty from "./properties/pages/NewProperty";
@@ -14,12 +21,8 @@ import UserProperties from "./properties/pages/UserProperties";
 import MainNavigation from "./shared/components/Navigation/MainNavigation";
 import { AuthContext } from "./shared/context/auth-context";
 
+//styling sheet
 import "./App.css";
-
-/*z
- * [App] is the root component, on the top of the rest of the components.
- *  Here all the part are put together and the routing is done.
- */
 
 const App = () => {
   const [isLoggedIn, setIsLoggedIn] = useState(false);
@@ -37,34 +40,49 @@ const App = () => {
   if (isLoggedIn) {
     routes = (
       <Switch>
-        <Route path="/" exact>   {/* Create exact routing. "/" is a filter */}
+        <Route path="/" exact>
+          {" "}
+          {/* Create exact routing. "/" is a filter */}
           <Users />
         </Route>
-        <Route path="/:userId/properties" exact>   {/* Create exact routing. "/" is a filter */}
+        <Route path="/:userId/properties" exact>
+          {" "}
+          {/* Create exact routing. "/" is a filter */}
           <UserProperties />
         </Route>
-        <Route path="/properties/new" exact>   {/* Create exact routing. "/" is a filter */}
+        <Route path="/properties/new" exact>
+          {" "}
+          {/* Create exact routing. "/" is a filter */}
           <NewProperty />
         </Route>
-        <Route path="/properties/:propertyId">   {/* /properties/:propertyId should be after /properties/new, else  */}
-          <UpdateProperty />   {/* will be interpreted as the first route. Create exact routing. "/" is a filter */}
+        <Route path="/properties/:propertyId">
+          {" "}
+          {/* /properties/:propertyId should be after /properties/new, else  */}
+          <UpdateProperty />{" "}
+          {/* will be interpreted as the first route. Create exact routing. "/" is a filter */}
         </Route>
-        <Redirect to="/" />   {/* If the path after the / is invalid user will be redirected back */}
+        <Redirect to="/" />{" "}
+        {/* If the path after the / is invalid user will be redirected back */}
       </Switch>
     );
   } else {
     routes = (
       <Switch>
-        <Route path="/" exact>   {/* Create exact routing. "/" is a filter */}
+        <Route path="/" exact>
+          {" "}
+          {/* Create exact routing. "/" is a filter */}
           <Users />
         </Route>
-        <Route path="/:userId/properties" exact>   {/* Create exact routing. "/" is a filter */}
+        <Route path="/:userId/properties" exact>
+          {" "}
+          {/* Create exact routing. "/" is a filter */}
           <UserProperties />
         </Route>
         <Route path="/auth">
           <Auth />
         </Route>
-        <Redirect to="/auth" />   {/* If the path after the / is invalid user will be redirected back */}
+        <Redirect to="/auth" />{" "}
+        {/* If the path after the / is invalid user will be redirected back */}
       </Switch>
     );
   }
@@ -72,15 +90,16 @@ const App = () => {
   return (
     <AuthContext.Provider
       value={{ isLoggedIn: isLoggedIn, login: login, logout: logout }}
-    >                              {/* Context component have to be around all the components that will use it */}
+    >
+      {" "}
+      {/* Context component have to be around all the components that will use it */}
       <Router>
         <MainNavigation />
-        <main>
-          {routes}
-        </main>
+        <main>{routes}</main>
       </Router>
     </AuthContext.Provider>
   );
 };
 
+//export component
 export default App;
