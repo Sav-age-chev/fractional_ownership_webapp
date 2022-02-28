@@ -28,7 +28,7 @@ const Auth = () => {
   //instantiating state
   const [isLoginMode, setIsLoginMode] = useState(true);
 
-  //call to the custom http hook prior to the request as provides pointers to multiple require values such as state. Object destructuring used
+  //call to the custom http hook prior to the request as some of the values of the component are required, such as state. Object destructuring used
   const { isLoading, error, sendRequest, clearError } = useHttpClient();
 
   //login mode
@@ -80,7 +80,7 @@ const Auth = () => {
 
       try {
         //sending http request. [sendRequest] is a pointer to the function within the http hook and expects url, method, body & headers as arguments
-        await sendRequest(
+        const responseData = await sendRequest(
           /* URL */
           "http://localhost:5000/api/users/login",
           /* METHOD */
@@ -96,14 +96,14 @@ const Auth = () => {
         );
 
         //login user
-        auth.login();
+        auth.login(responseData.user.id);
       } catch (err) {}
     } else {
       //SIGNUP
 
       try {
         //sending http request. [sendRequest] is a pointer to the function within the http hook and expects url, method, body & headers as arguments
-        await sendRequest(
+        const responseData = await sendRequest(
           /* URL */
           "http://localhost:5000/api/users/signup",
           /* METHOD */
@@ -120,7 +120,7 @@ const Auth = () => {
         );
 
         //login user
-        auth.login();
+        auth.login(responseData.user.id);
       } catch (err) {}
     }
   };

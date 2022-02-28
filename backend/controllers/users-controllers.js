@@ -103,7 +103,10 @@ const login = async (req, res, next) => {
   }
 
   //response to the request
-  res.json({ message: "Logged in!" });
+  res.json({
+    message: "Logged in!",
+    user: existingUser.toObject({ getters: true }),
+  });
 };
 
 //exporting functions pointers rather than executables

@@ -1,35 +1,54 @@
-import React from "react";
+/*
+ * [NewProperty] is the page where the user can add new property
+ */
 
+//import libraries
+import React, { useContext } from "react";
+
+//local imports
 import Input from "../../shared/components/FormElements/Input";
 import Button from "../../shared/components/FormElements/Button";
 import { useForm } from "../../shared/hooks/form-hook";
+import { AuthContext } from "../../shared/context/auth-context";
+import { useHttpClient } from "../../shared/hooks/http-hook";
 import {
   VALIDATOR_MINLENGTH,
   VALIDATOR_REQUIRE,
 } from "../../shared/util/validators";
 
+//style sheet
 import "./PropertyForm.css";
 
-/*
- * [NewProperty] is the page where the user can add new property
- */
-
+//
 const NewProperty = () => {
+  //call the http client prior to the request as some of the values of the component are required, such as state. Object destructuring used
+  const { isLoading, error, sendRequest, clearError } = useHttpClient();
+
+  //set up listener to the context
+  const auth = useContext(AuthContext);
+
   //check if the form is valid
-  const [formState, inputHandler] = useForm({
-    title: {
-      value: '',
-      isValid: false
+  const [formState, inputHandler] = useForm(
+    {
+      title: {
+        value: "",
+        isValid: false,
+      },
+      description: {
+        value: "",
+        isValid: false,
+      },
+      address: {
+        value: "",
+        isValid: false,
+      },
+      price: {
+        value: "",
+        isValid: false,
+      },
     },
-    description: {
-      value: '',
-      isValid: false
-    },
-    address: {
-      value: '',
-      isValid: false
-    },
-  }, false);
+    false
+  );
 
   //check if title/description is valid
   // const inputHandler = useCallback((id, value, isValid) => {
@@ -41,9 +60,23 @@ const NewProperty = () => {
   //   });
   // }, []);
 
-  const propertySubmitHandler = (event) => {
+  //sending asynchronous http request to the back end via http hook with the extracted inputs
+  const propertySubmitHandler = async (event) => {
     event.preventDefault();
-    console.log(formState.inputs); //here send data to server/backend
+    try {
+      await sendRequest(
+        "http://localhost:5000/api/property",
+        "POST",
+        JSON.stringify({
+          title: formState.inputs.title.value,
+          description: formState.inputs.description.value,
+          address: formState.inputs.address.value,
+          price: formState.inputs.price.value,
+          availableShares: formState.inputs.price.value,
+          creator: auth.userId,
+        })
+      );
+    } catch (err) {}
   };
 
   return (
@@ -73,6 +106,15 @@ const NewProperty = () => {
         label="Address"
         validators={[VALIDATOR_REQUIRE()]}
         errorText="Please enter a valid address."
+        onInput={inputHandler}
+      />
+
+      <Input
+        id="price"
+        element="input"
+        label="Price"
+        validators={[VALIDATOR_REQUIRE()]}
+        errorText="Please enter a valid value."
         onInput={inputHandler}
       />
 
