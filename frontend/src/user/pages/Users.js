@@ -18,7 +18,7 @@ const Users = () => {
   //call to the custom http hook prior to the request as provides pointers to multiple require values such as state. Object destructuring used
   const { isLoading, error, sendRequest, clearError } = useHttpClient();
 
-  //fetching users. useEffect hook allows to run certain code{} only on specific events[] instead of on each render
+  //fetching users. [useEffect] hook allows to run certain code{} only on specific events[] instead of on each render
   useEffect(() => {
     //creating and call function inside as it is bad practice to return promise in [useEffect]
     const fetchUsers = async () => {
@@ -47,4 +47,5 @@ const Users = () => {
   );
 };
 
+//export method
 export default Users;

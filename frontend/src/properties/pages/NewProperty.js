@@ -4,10 +4,13 @@
 
 //import libraries
 import React, { useContext } from "react";
+import { useHistory } from "react-router-dom";
 
 //local imports
 import Input from "../../shared/components/FormElements/Input";
 import Button from "../../shared/components/FormElements/Button";
+import ErrorModal from "../../shared/components/UIElements/ErrorModal";
+import LoadingSpinner from "../../shared/components/UIElements/LoadingSpinner";
 import { useForm } from "../../shared/hooks/form-hook";
 import { AuthContext } from "../../shared/context/auth-context";
 import { useHttpClient } from "../../shared/hooks/http-hook";
@@ -50,22 +53,15 @@ const NewProperty = () => {
     false
   );
 
-  //check if title/description is valid
-  // const inputHandler = useCallback((id, value, isValid) => {
-  //   dispatch({
-  //     type: "INPUT_CHANGE",
-  //     value: value,
-  //     isValid: isValid,
-  //     inputId: id,
-  //   });
-  // }, []);
+  //storing history stack as const
+  const history = useHistory();
 
   //sending asynchronous http request to the back end via http hook with the extracted inputs
   const propertySubmitHandler = async (event) => {
     event.preventDefault();
     try {
       await sendRequest(
-        "http://localhost:5000/api/property",
+        "http://localhost:5000/api/properties",
         "POST",
         JSON.stringify({
           title: formState.inputs.title.value,
@@ -74,54 +70,61 @@ const NewProperty = () => {
           price: formState.inputs.price.value,
           availableShares: formState.inputs.price.value,
           creator: auth.userId,
-        })
+        }),
+        { "Content-Type": "application/json" }
       );
+      //redirect user to different page
+      history.push("/");
     } catch (err) {}
   };
 
   return (
-    <form className="property-form" onSubmit={propertySubmitHandler}>
-      <Input
-        id="title"
-        element="input"
-        type="text"
-        label="Title"
-        validators={[VALIDATOR_REQUIRE()]}
-        errorText="Please enter a valid title."
-        onInput={inputHandler}
-      />
+    <React.Fragment>
+      <ErrorModal error={error} onClear={clearError} />
+      <form className="property-form" onSubmit={propertySubmitHandler}>
+        {isLoading && <LoadingSpinner asOverlay />}
+        <Input
+          id="title"
+          element="input"
+          type="text"
+          label="Title"
+          validators={[VALIDATOR_REQUIRE()]}
+          errorText="Please enter a valid title."
+          onInput={inputHandler}
+        />
 
-      <Input
-        id="description"
-        element="textarea"
-        label="Description"
-        validators={[VALIDATOR_MINLENGTH(5)]}
-        errorText="Please enter a valid description. At least 5 characters."
-        onInput={inputHandler}
-      />
+        <Input
+          id="description"
+          element="textarea"
+          label="Description"
+          validators={[VALIDATOR_MINLENGTH(5)]}
+          errorText="Please enter a valid description. At least 5 characters."
+          onInput={inputHandler}
+        />
 
-      <Input
-        id="address"
-        element="input"
-        label="Address"
-        validators={[VALIDATOR_REQUIRE()]}
-        errorText="Please enter a valid address."
-        onInput={inputHandler}
-      />
+        <Input
+          id="address"
+          element="input"
+          label="Address"
+          validators={[VALIDATOR_REQUIRE()]}
+          errorText="Please enter a valid address."
+          onInput={inputHandler}
+        />
 
-      <Input
-        id="price"
-        element="input"
-        label="Price"
-        validators={[VALIDATOR_REQUIRE()]}
-        errorText="Please enter a valid value."
-        onInput={inputHandler}
-      />
+        <Input
+          id="price"
+          element="input"
+          label="Price"
+          validators={[VALIDATOR_REQUIRE()]}
+          errorText="Please enter a valid value."
+          onInput={inputHandler}
+        />
 
-      <Button type="submit" disabled={!formState.isValid}>
-        ADD PROPERTY
-      </Button>
-    </form>
+        <Button type="submit" disabled={!formState.isValid}>
+          ADD PROPERTY
+        </Button>
+      </form>
+    </React.Fragment>
   );
 };
 

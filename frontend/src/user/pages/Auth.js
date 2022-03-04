@@ -160,7 +160,7 @@ const Auth = () => {
             id="password"
             type="password"
             label="password"
-            validators={[VALIDATOR_MINLENGTH(5)]}
+            validators={[VALIDATOR_MINLENGTH(6)]}
             errorText="Please enter a valid password."
             onInput={inputHandler}
           />

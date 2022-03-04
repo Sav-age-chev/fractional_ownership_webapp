@@ -28,16 +28,18 @@ const PropertyList = (props) => {
         <PropertyItem
           key={property.id}
           id={property.id}
-          image={property.imageUrl}
+          image={property.image}
           title={property.title}
           description={property.description}
           address={property.address}
           creatorId={property.creator}
           coordinates={property.location}
+          onDelete={props.onDeleteProperty}
         />
       ))}
     </ul>
   );
 };
 
+//export method
 export default PropertyList;
