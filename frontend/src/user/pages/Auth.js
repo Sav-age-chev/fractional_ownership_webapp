@@ -69,7 +69,7 @@ const Auth = () => {
           image: {
             value: null,
             isValid: false,
-          }
+          },
         },
         false
       );
@@ -81,7 +81,7 @@ const Auth = () => {
   const authSubmitHandler = async (event) => {
     event.preventDefault();
 
-    console.log(formState.inputs) //<------ diagnostic ----------- DELETE ME ! ----------------
+    console.log(formState.inputs); //<------ diagnostic ----------- DELETE ME ! ----------------
 
     if (isLoginMode) {
       //LOGIN
@@ -110,21 +110,21 @@ const Auth = () => {
       //SIGNUP
 
       try {
+        //[FormData] browser API used to pass data including images. Need to use form data because JSON can not process images/binary
+        const formData = new FormData();
+        formData.append("email", formState.inputs.email.value);
+        formData.append("name", formState.inputs.name.value);
+        formData.append("password", formState.inputs.password.value);
+        formData.append("image", formState.inputs.image.value);
         //sending http request. [sendRequest] is a pointer to the function within the http hook and expects url, method, body & headers as arguments
         const responseData = await sendRequest(
           /* URL */
           "http://localhost:5000/api/users/signup",
           /* METHOD */
           "POST",
-          /* body: the data. Converts JavaScript to JSON data */
-          JSON.stringify({
-            name: formState.inputs.name.value,
-            email: formState.inputs.email.value,
-            password: formState.inputs.password.value,
-          }),
-          /* headers: type of data */ {
-            "Content-Type": "application/json",
-          }
+          /* body: the data. passing the [FormData] object */
+          formData
+          /* headers: [FormData] automatically set the headers */
         );
 
         //login user
@@ -154,7 +154,12 @@ const Auth = () => {
           )}
 
           {!isLoginMode && (
-            <ImageUpload center id="image" onInput={inputHandler} />
+            <ImageUpload
+              center
+              id="image"
+              onInput={inputHandler}
+              errorText="Please provide an image."
+            />
           )}
 
           <Input

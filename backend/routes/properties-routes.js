@@ -7,6 +7,7 @@ const express = require("express");
 const { check } = require("express-validator");
 
 //local imports
+const fileUpload = require("../middleware/file-upload");
 const propertiesControllers = require("../controllers/properties-controllers");
 
 //instantiating [router] object
@@ -21,6 +22,7 @@ router.get("/user/:uid", propertiesControllers.getPropertiesByUserId);
 //add a new property. First execute methods to validate the input and then uses pointer to a function and not executing it ()
 router.post(
   "/",
+  fileUpload.single("image"),
   [
     check("title").not().isEmpty(),
     check("description").isLength({ min: 5 }),

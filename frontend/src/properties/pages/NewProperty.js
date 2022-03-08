@@ -10,6 +10,7 @@ import { useHistory } from "react-router-dom";
 import Input from "../../shared/components/FormElements/Input";
 import Button from "../../shared/components/FormElements/Button";
 import ErrorModal from "../../shared/components/UIElements/ErrorModal";
+import ImageUpload from "../../shared/components/FormElements/ImageUpload";
 import LoadingSpinner from "../../shared/components/UIElements/LoadingSpinner";
 import { useForm } from "../../shared/hooks/form-hook";
 import { AuthContext } from "../../shared/context/auth-context";
@@ -49,6 +50,10 @@ const NewProperty = () => {
         value: "",
         isValid: false,
       },
+      image: {
+        value: null,
+        isValid: false,
+      },
     },
     false
   );
@@ -60,18 +65,22 @@ const NewProperty = () => {
   const propertySubmitHandler = async (event) => {
     event.preventDefault();
     try {
+      //[FormData] browser API used to pass data including images. Need to use form data because JSON can not process images/binary
+      const formData = FormData();
+      formData.append("title", formState.inputs.title.value);
+      formData.append("description", formState.inputs.description.value);
+      formData.append("address", formState.inputs.address.value);
+      formData.append("price", formState.inputs.price.value);
+      formData.append("creator", auth.userId);
+      formData.append("image", formState.inputs.image.value);
+
+      console.log(formData); // <------ diagnostic -------- DELETE ME ! -----------
+
       await sendRequest(
         "http://localhost:5000/api/properties",
         "POST",
-        JSON.stringify({
-          title: formState.inputs.title.value,
-          description: formState.inputs.description.value,
-          address: formState.inputs.address.value,
-          price: formState.inputs.price.value,
-          availableShares: formState.inputs.price.value,
-          creator: auth.userId,
-        }),
-        { "Content-Type": "application/json" }
+        formData
+        /* headers: [FormData] automatically set the headers */
       );
       //redirect user to different page
       history.push("/");
@@ -118,6 +127,12 @@ const NewProperty = () => {
           validators={[VALIDATOR_REQUIRE()]}
           errorText="Please enter a valid value."
           onInput={inputHandler}
+        />
+
+        <ImageUpload
+          id="image"
+          onInput={inputHandler}
+          errorText="Please provide an image."
         />
 
         <Button type="submit" disabled={!formState.isValid}>

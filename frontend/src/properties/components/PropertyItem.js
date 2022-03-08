@@ -75,7 +75,7 @@ const PropertyItem = (props) => {
         show={showConfirmModal}
         onCancel={cancelDeleteHandler}
         header="Are you sure?"
-        footer="property-item__modal-actions"
+        footerClass="property-item__modal-actions"
         footer={
           <React.Fragment>
             <Button inverse onClick={cancelDeleteHandler}>
@@ -93,7 +93,7 @@ const PropertyItem = (props) => {
         <Card className="property-item__content">
           {isLoading && <LoadingSpinner asOverlay />}
           <div className="property-item__image">
-            <img src={props.image} alt={props.title} />
+            <img src={`http://localhost:5000/${props.image}`} alt={props.title} />
           </div>
           <div className="property-item__info">
             <h2>{props.title}</h2>

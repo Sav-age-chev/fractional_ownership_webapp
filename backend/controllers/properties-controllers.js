@@ -4,7 +4,9 @@
 
 //import libraries
 //const uuid = require("uuid"); //generates IDs -----> D E L E T E   M E   A T   S O M E   P O I N T ! <-----
+const fs = require('fs');
 const { validationResult } = require("express-validator");
+
 const mongoose = require("mongoose");
 
 //local imports
@@ -143,8 +145,7 @@ const createProperty = async (req, res, next) => {
     description,
     address,
     location: coordinates,
-    image:
-      "https://images.pexels.com/photos/614810/pexels-photo-614810.jpeg?auto=compress&cs=tinysrgb&dpr=3&h=750&w=1260/",
+    image: req.file.path,
     creator,
     //--------------------FOW-------------------------
     propertyShares: [],
@@ -436,7 +437,7 @@ const updateProperty = async (req, res, next) => {
     return next(error);
   }
 
-  // 
+  //
   property.title = title;
   property.description = description;
 
@@ -483,6 +484,9 @@ const deleteProperty = async (req, res, next) => {
     return next(error);
   }
 
+  //get the image path
+  const imagePath = property.image;
+
   //try to delete property from database with an asynchronous method. Catch and displays error if it fail
   try {
     //starting new session
@@ -503,6 +507,11 @@ const deleteProperty = async (req, res, next) => {
       500
     );
   }
+
+  //delete image if the execution reach this point
+  fs.unlink(imagePath, err => {
+    console.log(err);
+  })
 
   //response to the request
   res.status(200).json({ message: "Property deleted." });

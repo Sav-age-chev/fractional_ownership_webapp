@@ -61,8 +61,7 @@ const signup = async (req, res, next) => {
   const createdUser = new User({
     name, //When same name: (name == name: name)
     email,
-    image:
-      "https://images.pexels.com/photos/614810/pexels-photo-614810.jpeg?auto=compress&cs=tinysrgb&dpr=3&h=750&w=1260/",
+    image: req.file.path,
     password,
     properties: [],
     userShares: [],
