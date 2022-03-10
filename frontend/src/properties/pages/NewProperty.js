@@ -63,10 +63,19 @@ const NewProperty = () => {
 
   //sending asynchronous http request to the back end via http hook with the extracted inputs
   const propertySubmitHandler = async (event) => {
+    console.log(
+      formState.inputs.title.value,
+      formState.inputs.description.value,
+      formState.inputs.address.value,
+      formState.inputs.price.value,
+      auth.userId,
+      formState.inputs.image.value
+    );
+
     event.preventDefault();
     try {
       //[FormData] browser API used to pass data including images. Need to use form data because JSON can not process images/binary
-      const formData = FormData();
+      const formData = new FormData();
       formData.append("title", formState.inputs.title.value);
       formData.append("description", formState.inputs.description.value);
       formData.append("address", formState.inputs.address.value);
@@ -74,7 +83,7 @@ const NewProperty = () => {
       formData.append("creator", auth.userId);
       formData.append("image", formState.inputs.image.value);
 
-      console.log(formData); // <------ diagnostic -------- DELETE ME ! -----------
+      console.log("hello1"); // <------ diagnostic -------- DELETE ME ! -----------
 
       await sendRequest(
         "http://localhost:5000/api/properties",
@@ -84,7 +93,9 @@ const NewProperty = () => {
       );
       //redirect user to different page
       history.push("/");
-    } catch (err) {}
+    } catch (err) {
+      console.log("error apparently"); // <------ diagnostic -------- DELETE ME ! -----------
+    }
   };
 
   return (

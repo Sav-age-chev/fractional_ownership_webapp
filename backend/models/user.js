@@ -27,8 +27,8 @@ const userSchema = new Schema({
   //-------------------------FOW----------------------------
 });
 
-//add the unique validator to the schema
-userSchema.plugin(uniqueValidator);
+//add the unique validator to the schema - there is some issue with the mongoose and the validator
+//userSchema.plugin(uniqueValidator);
 
 //export model
 module.exports = mongoose.model("User", userSchema);

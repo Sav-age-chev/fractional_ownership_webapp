@@ -92,7 +92,7 @@ const UpdateProperty = () => {
     event.preventDefault();
     try {
       //sending http request via the [http-hook]. [sendRequest] is a pointer and take arguments for url, method, body && headers
-      const responseData = await sendRequest(
+      await sendRequest(
         `http://localhost:5000/api/properties/${propertyId}`,
         "PATCH",
         JSON.stringify({

@@ -6,7 +6,6 @@
 //const uuid = require("uuid"); //generates IDs -----> D E L E T E   M E   A T   S O M E   P O I N T ! <-----
 const fs = require('fs');
 const { validationResult } = require("express-validator");
-
 const mongoose = require("mongoose");
 
 //local imports
@@ -126,7 +125,7 @@ const createProperty = async (req, res, next) => {
   }
 
   //object destructuring
-  const { title, description, address, creator, price, availableShares } =
+  const { title, description, address, creator, price } =
     req.body;
 
   //convert address to coordinates
@@ -146,11 +145,13 @@ const createProperty = async (req, res, next) => {
     address,
     location: coordinates,
     image: req.file.path,
+    //image, 
+    //image: "uploads/images/510e23c0-9fde-11ec-808e-79d66390cc23.png",
     creator,
     //--------------------FOW-------------------------
     propertyShares: [],
     price,
-    availableShares,
+    availableShares: 100,
     //--------------------FOW-------------------------
   });
 
@@ -177,6 +178,8 @@ const createProperty = async (req, res, next) => {
     return next(error);
   }
 
+  console.log(user);
+
   //try to add new property to the database with the async method [save()]. Catch and display error if fail
   // NOTE: if we dont have collection [properties], will have to created manually !!!
   try {
@@ -185,18 +188,22 @@ const createProperty = async (req, res, next) => {
     //starting a transaction
     sess.startTransaction();
     //saves the property
+    //await createdProperty.save(); 
     await createdProperty.save({ session: sess });
     //adding the property id to the user
     user.properties.push(createdProperty);
     //saves the user
+    //await user.save(); 
     await user.save({ session: sess });
     //session commits the transaction if all previous commands has been executed successfully
     await sess.commitTransaction();
   } catch (err) {
+    console.log(err);
     const error = new HttpError(
       "Creating new property failed, please try again.",
       500
     );
+    console.log("hello", error);
     return next(error);
   }
 
