@@ -16,6 +16,9 @@ const router = express.Router();
 //get property by property id. Uses pointer to a function and not executing it ()
 router.get("/:pid", propertiesControllers.getPropertyById);
 
+//get all properties. Call to pointer to a function
+router.get("/list", propertiesControllers.getAllProperties);
+
 //get property by user id. Uses pointer to a function and not executing it ()
 router.get("/user/:uid", propertiesControllers.getPropertiesByUserId);
 

@@ -18,25 +18,25 @@ const User = require("../models/user");
 //--------------------FOW-------------------------
 
 //--------------------FOW-------------------------
-// //get all properties
-// const getProperties = async (req, res, next) => {
-//   //instantiating new variable with scope of the object
-//   let properties;
-//   //fetching all properties excluding their [creator] field. Return error if method fails
-//   try {
-//     properties = await Property.find({}, "-creator");
-//   } catch (err) {
-//     const error = new HttpError(
-//       "Something went wrong, please try again later",
-//       404
-//     );
-//     return next(error);
-//   }
-//   //as the return is an array need to use map to convert to JavaScript objects
-//   res.json({
-//     properties: properties.map((property) => property.toObject({ getters: true })),
-//   });
-// };
+//get all properties
+const getAllProperties = async (req, res, next) => {
+  //instantiating new variable with scope of the object
+  let properties;
+  //fetching all properties excluding their [creator] field. Return error if method fails
+  try {
+    properties = await Property.find({}, "-creator");
+  } catch (err) {
+    const error = new HttpError(
+      "Something went wrong, please try again later",
+      404
+    );
+    return next(error);
+  }
+  //as the return is an array need to use map to convert to JavaScript objects
+  res.json({
+    properties: properties.map((property) => property.toObject({ getters: true })),
+  });
+};
 //--------------------FOW-------------------------
 
 //get property by id. Asynchronous task
@@ -525,6 +525,7 @@ const deleteProperty = async (req, res, next) => {
 };
 
 //exporting functions pointers rather than executables
+exports.getAllProperties = getAllProperties;
 exports.getPropertyById = getPropertyById;
 exports.getPropertiesByUserId = getPropertiesByUserId;
 exports.createProperty = createProperty;
