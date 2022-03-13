@@ -5,7 +5,6 @@
 
 //import libraries
 import React, { useEffect, useState } from "react";
-import { useParams } from "react-router-dom";
 
 //local imports
 import PropertyList from "../components/PropertyList";
@@ -28,7 +27,7 @@ const AllProperties = () => {
       try {
         //sending http request. [sendRequest] is a pointer to the function within the http hook and expects url and for the rest of the arguments will use default
         const responseData = await sendRequest(
-          `http://localhost:5000/api/properties/list`
+          "http://localhost:5000/api/properties/list"
         );
         setLoadedProperties(responseData.properties);
       } catch (err) {}
@@ -36,9 +35,8 @@ const AllProperties = () => {
     fetchProperties();
   }, [sendRequest]);
 
-  //function triggered upon deletion that filter the property list by comparing against the id of recently deleted 
+  //function triggered upon deletion that filter the property list by comparing against the id of recently deleted
   const propertyDeletedHandler = (deletedPropertyId) => {
-    console.log("AllProperties: " + deletedPropertyId);   //<--------- diagnostic ------------ DELETE ME ! ---------------------
     setLoadedProperties((prevProperty) =>
       prevProperty.filter((property) => property.id !== deletedPropertyId)
     );

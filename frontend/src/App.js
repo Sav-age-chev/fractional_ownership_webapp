@@ -60,9 +60,9 @@ const App = () => {
           <NewProperty />
         </Route>
         {/* Create exact routing. "/properties/new" is a filter */}
-        {/* <Route path="/properties/list" exact>
+        <Route path="/properties/list" exact>
           <AllProperties />
-        </Route> */}
+        </Route>
         {/* /properties/:propertyId should be after /properties/new, else  */}
         {/* will be interpreted as the first route. Create exact routing. "/" is a filter */}
         <Route path="/properties/:propertyId">
@@ -80,9 +80,9 @@ const App = () => {
           <Users />
         </Route>
         {/* Create exact routing. "/properties/new" is a filter */}
-        {/* <Route path="/properties/list" exact>
+        <Route path="/properties/list" exact>
           <AllProperties />
-        </Route> */}
+        </Route>
         {/* Create exact routing. "/" is a filter */}
         <Route path="/:userId/properties" exact>
           <UserProperties />

@@ -19,22 +19,60 @@ const User = require("../models/user");
 
 //--------------------FOW-------------------------
 //get all properties
+// const getAllProperties = async (req, res, next) => {
+//   //instantiating new variable with scope of the object
+//   let properties;
+//   //fetching all properties excluding their [creator] field. Return error if method fails
+//   try {
+//     properties = await Property.find();
+//   } catch (err) {
+//     const error = new HttpError(
+//       "Something went wrong, please try again later",
+//       404
+//     );
+//     return next(error);
+//   }
+//   //as the return is an array need to use map to convert to JavaScript objects
+//   res.json({
+//     properties: properties.map((property) => property.toObject({ getters: true })),
+//   });
+// };
 const getAllProperties = async (req, res, next) => {
-  //instantiating new variable with scope of the object
+
+  console.log("getAllProperties - Hello1");   // <-------- diagnostic -------- DELETE ME ! ----------------------------------------------------------
+
+  //instantiating new variable with a scope of the method
   let properties;
-  //fetching all properties excluding their [creator] field. Return error if method fails
+  // ALTERNATIVE: let properties;
+
+  //get the properties by comparing user id from url against database creator field. Returns error if fail
   try {
-    properties = await Property.find({}, "-creator");
+    properties = await Property.find({});
   } catch (err) {
     const error = new HttpError(
-      "Something went wrong, please try again later",
-      404
+      "Fetching properties failed, please try again later.",
+      500
     );
     return next(error);
   }
-  //as the return is an array need to use map to convert to JavaScript objects
+
+  //returns error in case no properties was found
+  if (!properties || properties.length === 0) {
+    return next(
+      new HttpError("Could not find any properties", 404)
+    );
+  }
+
+  //response to the request. Using [map] as we browse trough an array. Then covert to JavaScript object and activate the getters to get rid of the underscore
+  // res.json({
+  //   properties: userWithProperties.properties.map((property) =>
+  //     property.toObject({ getters: true })
+  //   ),
+  // });
   res.json({
-    properties: properties.map((property) => property.toObject({ getters: true })),
+      properties: properties.map((property) =>
+      property.toObject({ getters: true })
+    ),
   });
 };
 //--------------------FOW-------------------------
