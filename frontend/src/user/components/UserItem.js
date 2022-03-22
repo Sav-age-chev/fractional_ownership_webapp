@@ -1,9 +1,19 @@
+/*
+ * [UserItem.js] component is used to display the information of a user within
+ */
+
+//import libraries
 import React from "react";
 import { Link } from "react-router-dom"; //Raps and renders anchor tag and block navigation logic
+
+//local imports
 import Avatar from "../../shared/components/UIElements/Avatar";
 import Card from "../../shared/components/UIElements/Card";
+
+//stylesheet
 import "./UserItem.css";
 
+//function
 const UserItem = (props) => {
   return (
     <li className="user-item">
@@ -25,4 +35,5 @@ const UserItem = (props) => {
   );
 };
 
+//export function
 export default UserItem;
