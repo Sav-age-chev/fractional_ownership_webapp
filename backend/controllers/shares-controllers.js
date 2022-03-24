@@ -92,11 +92,14 @@ const buyPropertyShare = async (req, res, next) => {
   }
 
   //get data from the body
-  const { owner, propertyTitle, cost, share } = req.body;
+  const { owner, shareProperty, propertyTitle, cost, share } = req.body;
   //get id from the url
-  const shareProperty = req.params.pid;
+  const propertyId = req.params.pid;
 
-  console.log(shareProperty); // <---------- diagnostic ---------- PLEASE DELETE ME ! ---------
+  //instantiating new variable with a scope of the method
+  let property;
+
+  console.log(propertyId); // <---------- diagnostic ---------- PLEASE DELETE ME ! ---------
 
   //instantiating new object using the blueprint from models
   const createdShare = new Share({
@@ -109,9 +112,6 @@ const buyPropertyShare = async (req, res, next) => {
   });
 
   console.log(createdShare); // <---------- diagnostic ---------- PLEASE DELETE ME ! ---------
-
-  //instantiating new variable with a scope of the method
-  let property;
 
   //try to get property by id from database with an asynchronous method. Catch and displays error if it fail
   try {
