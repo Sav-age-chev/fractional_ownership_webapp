@@ -2,15 +2,15 @@ import React from "react";
 
 import Card from "../../shared/components/UIElements/Card";
 import Button from "../../shared/components/FormElements/Button";
-import GeneralPropertyItem from "./GeneralProperyItem";
+import UserPropertyItem from "./UserPropertyItem";
 
 import "./PropertyList.css";
 
 /*
- * [GeneralPropertyList] components used to display list of users
+ * [UserPropertyList] components used to display list of users
  */
 
-const GeneralPropertyList = (props) => {
+const UserPropertyList = (props) => {
   if (props.items.length === 0) {
     return (
       <div className="property-list center">
@@ -25,7 +25,7 @@ const GeneralPropertyList = (props) => {
   return (
     <ul className="property-list">
       {props.items.map((property) => (
-        <GeneralPropertyItem
+        <UserPropertyItem
           key={property.id}
           id={property.id}
           image={property.image}
@@ -43,4 +43,4 @@ const GeneralPropertyList = (props) => {
 };
 
 //export method
-export default GeneralPropertyList;
+export default UserPropertyList;

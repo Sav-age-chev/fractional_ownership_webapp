@@ -263,57 +263,69 @@ const sellPropertyShare = async (req, res, next) => {
   res.status(200).json({ message: "Share sold." });
 };
 
-// //update existing property
-// const updateProperty = async (req, res, next) => {
-//   //check validation results and return error in case is not empty
-//   const errors = validationResult(req);
-//   if (!errors.isEmpty()) {
-//     return next(
-//       new HttpError("Invalid inputs passed, please check your data.", 422)
-//     );
-//   }
+//update existing share
+const updateShare = async (req, res, next) => {
+  //check validation results and return error in case is not empty
+  const errors = validationResult(req);
+  console.log(errors); // <----------------------- DELETE ME ! ----------------------------------------------------------
+  if (!errors.isEmpty()) {
+    return next(
+      new HttpError("Invalid inputs passed, please check your data.", 422)
+    );
+  }
 
-//   //get data from the body
-//   const { title, description } = req.body;
-//   //get id from the url
-//   const propertyId = req.params.pid;
+  //get data from the body
+  const { userId, newShare } = req.body;
+  //get id from the url
+  const propertyId = req.params.pid;
 
-//   //instantiating new variable with a scope of the method
-//   let property;
+  console.log(userId + " " + newShare + " " + propertyId); // <----------------------- DELETE ME ! --------------------------
 
-//   //try to get property by id from database with an asynchronous method. Catch and displays error if it fail
-//   try {
-//     property = await Property.findById(propertyId);
-//   } catch (err) {
-//     const error = new HttpError(
-//       "Something went wrong, could not update property.",
-//       500
-//     );
-//     return next(error);
-//   }
+  //instantiating new variable with a scope of the method
+  let share;
 
-//   //updating details
-//   property.title = title;
-//   property.description = description;
+  //try to get share by user and property id from database with an asynchronous method. Catch and displays error if it fail
+  try {
+    share = await Share.find({owner: userId, shareProperty: propertyId });
+  } catch (err) {
+    const error = new HttpError(
+      "Something went wrong, could not update share.",
+      500
+    );
+    return next(error);
+  }
 
-//   //try to save the newly updated property into the database with asynchronous method. Catch and displays error if it fails
-//   try {
-//     await property.save();
-//   } catch (err) {
-//     const error = new HttpError(
-//       "Something went wrong, could not update property",
-//       500
-//     );
-//     return next(error);
-//   }
+  // try {
+  //   property = await Property.findById(propertyId);
+  // } catch (err) {
+  //   const error = new HttpError(
+  //     "Something went wrong, could not update property.",
+  //     500
+  //   );
+  //   return next(error);
+  // }
 
-//   //response to the request. Covert [property] to JavaScript object. {getters: true} removes the underscore from the id
-//   res.status(200).json({ property: property.toObject({ getters: true }) });
-// };
+  //updating details
+  share.share = newShare;
+
+  //try to save the newly updated share into the database with asynchronous method. Catch and displays error if it fails
+  try {
+    await share.save();
+  } catch (err) {
+    const error = new HttpError(
+      "Something went wrong, could not update share",
+      500
+    );
+    return next(error);
+  }
+
+  //response to the request. Covert [share] to JavaScript object. {getters: true} removes the underscore from the id
+  res.status(200).json({ share: share.toObject({ getters: true }) });
+};
 
 //exporting functions pointers rather than executables
 exports.getShareById = getShareById;
 exports.getSharesByUserId = getSharesByUserId;
-// exports.updateProperty = updateProperty;
+exports.updateShare = updateShare;
 exports.buyPropertyShare = buyPropertyShare;
 exports.sellPropertyShare = sellPropertyShare;

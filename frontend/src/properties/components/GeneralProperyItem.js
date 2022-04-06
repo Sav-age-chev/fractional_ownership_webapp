@@ -97,14 +97,15 @@ const GeneralPropertyItem = (props) => {
             <Button inverse onClick={openMapHandler}>
               VIEW ON MAP
             </Button>
-            {auth.isLoggedIn && (
+            <Button to={`/shares/${props.id}`}>SHARES</Button>
+            {/* {auth.isLoggedIn && (
               <Button to={`/properties/${props.id}`}>BUY SHARE</Button>
             )}
             {auth.isLoggedIn && (
               <Button danger onClick={showSellShareWarningHandler}>
                 SELL SHARE
               </Button>
-            )}
+            )} */}
           </div>
         </Card>
       </li>

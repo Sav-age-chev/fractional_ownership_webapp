@@ -8,7 +8,7 @@ import React, { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
 
 //local imports
-import PropertyList from "../components/PropertyList";
+import UserPropertyList from "../components/UserPropertyList";
 import ErrorModal from "../../shared/components/UIElements/ErrorModal";
 import LoadingSpinner from "../../shared/components/UIElements/LoadingSpinner";
 import { useHttpClient } from "../../shared/hooks/http-hook";
@@ -56,7 +56,7 @@ const UserProperties = () => {
         </div>
       )}
       {!isLoading && loadedProperties && (
-        <PropertyList
+        <UserPropertyList
           items={loadedProperties}
           onDeleteProperty={propertyDeletedHandler}
         />

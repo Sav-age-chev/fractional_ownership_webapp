@@ -27,12 +27,13 @@ router.post("/buy/:pid", [
 //delete share of a property. Uses pointer to a function and not executing it ()
 router.delete("/sell/:sid", sharesControllers.sellPropertyShare);
 
-// //edit existing property. First execute methods to validate the input and then uses pointer to a function and not executing it ()
-// router.patch(
-//   "/:pid",
-//   [check("title").not().isEmpty(), check("description").isLength({ min: 5 })],
-//   propertiesControllers.updateProperty
-//);
+//edit existing share. First execute methods to validate the input and then uses pointer to a function and not executing it ()
+router.patch(
+  "/edit/:sid",
+  //[check("newShare").not().isEmpty(), check("newShare").isDigit()],
+  [check("share").not().isEmpty()],
+  sharesControllers.updateShare
+);
 
 //exporting the file
 module.exports = router;

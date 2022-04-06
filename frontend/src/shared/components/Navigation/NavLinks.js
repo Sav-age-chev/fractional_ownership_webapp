@@ -13,13 +13,13 @@ const NavLinks = (props) => {
         <NavLink to="/properties/list">PROPERTIES</NavLink>
       </li>
       <li>
-        <NavLink to="/" exact>
+        <NavLink to="/users" exact>
           ALL USERS
         </NavLink>
       </li>
       {auth.isLoggedIn && (
         <li>
-          <NavLink to={`/shares/user/${auth.userId}`}>MY SHARES</NavLink>
+          <NavLink to={`/${auth.userId}/shares/`}>MY SHARES</NavLink>
         </li>
       )}
       {auth.isLoggedIn && (

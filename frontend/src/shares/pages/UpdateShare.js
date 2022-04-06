@@ -1,5 +1,5 @@
 /*
- * [UpdateProperty] is the page where the user can update existing property
+ * [UpdateShare] is the page where the user can buy/sell/update shares
  */
 
 //import libraries
@@ -21,21 +21,23 @@ import {
 } from "../../shared/util/validators";
 
 //style sheets
-import "./PropertyForm.css";
+import "./ShareForm.css";
 
 //function
-const UpdateProperty = () => {
+const UpdateShare = () => {
   //set up listener to the context
   const auth = useContext(AuthContext);
 
   //instantiating state
-  const [loadedProperty, setLoadedProperty] = useState();
+  //const [loadedProperty, setLoadedProperty] = useState();
+  const [loadedShare, setLoadedShare] = useState();
 
   //object destructuring
   const { isLoading, error, sendRequest, clearError } = useHttpClient();
 
-  //extracting property id from the url
-  const propertyId = useParams().propertyId;
+  //extracting share id from the url
+  const shareId = useParams().shareId;
+  //const propertyId = useParams().propertyId;   // <---------------------------------  PROBABLY NOT GONNA NEED THAT ----------------------------------
 
   //storing history stack as const
   const history = useHistory();
@@ -43,67 +45,66 @@ const UpdateProperty = () => {
   //form
   const [formState, inputHandler, setFormData] = useForm(
     {
-      title: {
+      share: {
         value: "",
         isValid: false,
       },
-      description: {
-        value: "",
-        isValid: false,
-      },
+      //   forSale: {
+      //     value: false,
+      //     isValid: false,
+      //   },
     },
     false
   );
 
-  //fetch property. [useEffect] executes the code within {} upon event from the [], instead on each render
+  //fetch share. [useEffect] executes the code within {} upon event from the [], instead on each render
   useEffect(() => {
     //instantiating asynchronous fetch function within the hook, as it is a bad practice to return a promise to [useEffect]
-    const fetchProperty = async () => {
+    const fetchShare = async () => {
       try {
         //sending http request via the [http-hook]. [sendRequest] is a pointer and take arguments for url, method, body && headers
         const responseData = await sendRequest(
-          `http://localhost:5000/api/properties/${propertyId}`
+          `http://localhost:5000/api/shares/${shareId}`
         );
-        //setting up state holding property data
-        setLoadedProperty(responseData.property);
+        //setting up state holding share data
+        setLoadedShare(responseData.share);
 
-        console.log(loadedProperty);
         //setting up the form inputs to the existing values from the database
         setFormData(
           {
-            title: {
-              value: responseData.property.title,
+            share: {
+              value: responseData.share.share,
               isValid: true,
             },
-            description: {
-              value: responseData.property.description,
-              isValid: true,
-            },
+            // forSale: {
+            //   value: responseData.share.forSale,
+            //   isValid: true,
+            // },
           },
           true
         );
       } catch (err) {}
     };
-    fetchProperty();
-  }, [sendRequest, propertyId, setFormData]);
+    fetchShare();
+  }, [sendRequest, shareId, setFormData]);
 
   //asynchronous function for submit event
-  const propertyUpdateSubmitHandler = async (event) => {
+  const shareUpdateSubmitHandler = async (event) => {
     event.preventDefault();
     try {
       //sending http request via the [http-hook]. [sendRequest] is a pointer and take arguments for url, method, body && headers
       await sendRequest(
-        `http://localhost:5000/api/properties/${propertyId}`,
+        `http://localhost:5000/api/shares/edit/${shareId}`,
         "PATCH",
         JSON.stringify({
-          title: formState.inputs.title.value,
-          description: formState.inputs.description.value,
+          share: formState.inputs.share.value,
+          forSale: formState.inputs.forSale.value,
         }),
         {
           "Content-Type": "application/json",
         }
       );
-      history.push('/' + auth.userId + '/properties');
+      history.push("/" + auth.userId + "/shares");
     } catch (err) {}
   };
 
@@ -116,12 +117,12 @@ const UpdateProperty = () => {
     );
   }
 
-  //return the message if there is no property or error response from the backend
-  if (!loadedProperty && !error) {
+  //return the message if there is no share or error response from the backend
+  if (!loadedShare && !error) {
     return (
       <div className="center">
         <Card>
-          <h2>Could not find property!</h2>
+          <h2>Could not find shares!</h2>
         </Card>
       </div>
     );
@@ -131,22 +132,40 @@ const UpdateProperty = () => {
   return (
     <React.Fragment>
       <ErrorModal error={error} onClear={clearError} />
-      {!isLoading && loadedProperty && (
-        <form className="property-form" onSubmit={propertyUpdateSubmitHandler}>
+      {!isLoading && loadedShare && (
+        <form className="share-form" onSubmit={shareUpdateSubmitHandler}>
+
+          <div className="">
+            <h2>{loadedShare.share.shareProperty.title}</h2>
+            <p>{loadedShare.share.shareProperty.description}</p>
+            <h3>{loadedShare.share.cost}</h3>
+            <h3>{loadedShare.share.share}</h3>
+            <h4>BUY/SELL</h4>
+          </div>
+
           <Input
-            id="title"
+            id="share"
             element="input"
-            type="text"
-            label="Title"
+            type="number"
+            label="Share"
             validators={[VALIDATOR_REQUIRE()]}
-            errorText="Please enter a valid title."
+            errorText="Please enter a valid number."
             onInput={inputHandler}
-            initialValue={loadedProperty.title}
+            initialValue={loadedShare.share}
             initialValid={true}
           />
 
-          <Input
-            id="description"
+          {/* <input
+            type="checkbox"
+            checked="unchecked"
+            name="For Sale"
+            disabled="disabled"
+          >
+            For Sale
+          </input> */}
+
+          {/* <Input
+            id="forSale"
             element="textarea"
             label="Description"
             validators={[VALIDATOR_MINLENGTH(5)]}
@@ -154,10 +173,10 @@ const UpdateProperty = () => {
             onInput={inputHandler}
             initialValue={loadedProperty.description}
             initialValid={true}
-          />
+          /> */}
 
           <Button type="submit" disabled={!formState.isValid}>
-            UPDATE PROPERTY
+            UPDATE SHARE
           </Button>
         </form>
       )}
@@ -166,4 +185,4 @@ const UpdateProperty = () => {
 };
 
 //export function
-export default UpdateProperty;
+export default UpdateShare;
