@@ -1,0 +1,28 @@
+.share-item__actions {
+    padding: 1rem;
+    text-align: center;
+    border-top: 1px solid #ccc;
+}
+
+.share-form {
+    list-style: none;
+    margin: 0 auto;
+    padding: 1rem;
+    width: 90%;
+    max-width: 40rem;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.26);
+    border-radius: 6px;
+    background: white;
+  }
+
+  .marketplace {
+    list-style: none;
+    margin: 1rem auto;
+    padding: 0;
+    width: 90%;
+    max-width: 40rem;
+    background: white;
+    margin-bottom: 0.5rem;
+
+  }
+  

@@ -18,20 +18,27 @@ router.get("/:sid", sharesControllers.getShareById);
 //get shares by user id. Uses pointer to a function and not executing it ()
 router.get("/user/:uid", sharesControllers.getSharesByUserId);
 
+//get shares by property id. Uses pointer to a function and not executing it ()
+router.get("/property/:pid", sharesControllers.getSharesByPropertyId);
+
 //buy share of a property. Uses pointer to a function and not executing it ()
-router.post("/buy/:pid", [
-  check("share").not().isEmpty(),
-  check("share").isNumeric()
-], sharesControllers.buyPropertyShare);
-    
+router.post(
+  "/buy/:pid",
+  [check("share").not().isEmpty(), check("share").isNumeric()],
+  sharesControllers.buyPropertyShare
+);
+
 //delete share of a property. Uses pointer to a function and not executing it ()
-router.delete("/sell/:sid", sharesControllers.sellPropertyShare);
+//router.delete("/sell/:sid", sharesControllers.sellPropertyShare);
+
+//delete share of a property. Uses pointer to a function and not executing it ()
+router.patch("/sell/:sid", sharesControllers.updateSharesOwner);
 
 //edit existing share. First execute methods to validate the input and then uses pointer to a function and not executing it ()
 router.patch(
   "/edit/:sid",
-  //[check("newShare").not().isEmpty(), check("newShare").isDigit()],
-  [check("share").not().isEmpty()],
+  [check("sellPrice").not().isEmpty(), check("sellPrice").isNumeric()],
+  //[check("share").not().isEmpty()],
   sharesControllers.updateShare
 );
 

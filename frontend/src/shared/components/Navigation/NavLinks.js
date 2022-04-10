@@ -12,24 +12,24 @@ const NavLinks = (props) => {
       <li>
         <NavLink to="/properties/list">PROPERTIES</NavLink>
       </li>
-      <li>
+      {/* <li>
         <NavLink to="/users" exact>
           ALL USERS
         </NavLink>
-      </li>
+      </li> */}
       {auth.isLoggedIn && (
         <li>
-          <NavLink to={`/${auth.userId}/shares/`}>MY SHARES</NavLink>
+          <NavLink to={`/${auth.userId}/shares/`}>PORTFOLIO</NavLink>
         </li>
       )}
       {auth.isLoggedIn && (
         <li>
-          <NavLink to={`/${auth.userId}/properties`}>MY PROPERTIES</NavLink>
+          <NavLink to={`/${auth.userId}/properties`}>MY ADVERTS</NavLink>
         </li>
       )}
       {auth.isLoggedIn && (
         <li>
-          <NavLink to="/properties/new">ADD PROPERTY</NavLink>
+          <NavLink to="/properties/new">POST NEW PROPERTY</NavLink>
         </li>
       )}
       {!auth.isLoggedIn && (

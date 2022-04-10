@@ -16,9 +16,10 @@ import {
 import Auth from "./user/pages/Auth";
 import Users from "./user/pages/Users";
 import Shares from "./shares/pages/Shares";
+import ShareMarket from "./shares/pages/ShareMarket";
+import UpdateShare from "./shares/pages/UpdateShare";
 import NewProperty from "./properties/pages/NewProperty";
 import AllProperties from "./properties/pages/AllProperties";
-import UpdateShare from "./shares/pages/UpdateShare";
 import UpdateProperty from "./properties/pages/UpdateProperty";
 import UserProperties from "./properties/pages/UserProperties";
 import MainNavigation from "./shared/components/Navigation/MainNavigation";
@@ -82,6 +83,10 @@ const App = () => {
         <Route path="/properties/:propertyId">
           <UpdateProperty />
         </Route>
+        {/* Create exact routing. "/shares/property/:shareId" is a filter */}
+        <Route path="/shares/property/:propertyId">
+          <ShareMarket />
+        </Route>
         {/* Create exact routing. "/shares/:shareId" is a filter */}
         <Route path="/shares/:shareId">
           <UpdateShare />
@@ -95,15 +100,11 @@ const App = () => {
       <Switch>
         {/* Create exact routing. "/" is a filter */}
         <Route path="/" exact>
-          <Users />
+          <AllProperties />
         </Route>
         {/* Create exact routing. "/properties/new" is a filter */}
         <Route path="/properties/list" exact>
           <AllProperties />
-        </Route>
-        {/* Create exact routing. "/" is a filter */}
-        <Route path="/:userId/properties" exact>
-          <UserProperties />
         </Route>
         {/* Create routing. "/auth" is a filter */}
         <Route path="/auth">

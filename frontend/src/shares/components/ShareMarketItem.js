@@ -1,86 +1,163 @@
 /*
- * [PropertyItem] component is used to store and display property information
+ * [ShareMarketItem.js] component is used to display the information of a share
  */
 
 //import libraries
 import React, { useState, useContext } from "react";
+import { Link } from "react-router-dom"; //Raps and renders anchor tag and block navigation logic
 
 //local imports
-import Map from "../../shared/components/UIElements/Map";
 import Card from "../../shared/components/UIElements/Card";
 import Modal from "../../shared/components/UIElements/Modal";
+import Avatar from "../../shared/components/UIElements/Avatar";
 import Button from "../../shared/components/FormElements/Button";
 import ErrorModal from "../../shared/components/UIElements/ErrorModal";
 import LoadingSpinner from "../../shared/components/UIElements/LoadingSpinner";
 import { AuthContext } from "../../shared/context/auth-context";
 import { useHttpClient } from "../../shared/hooks/http-hook";
 
-//style sheet
-import "./PropertyItem.css";
+//stylesheet
+import "./ShareMarketItem.css";
 
 //function
-const PropertyItem = (props) => {
+const ShareMarketItem = (props) => {
   //set up listener to the context
   const auth = useContext(AuthContext);
 
   //instantiate state
-  const [showMap, setShowMap] = useState(false);
   const [showConfirmModal, setShowConfirmModal] = useState(false);
 
   //object destructuring
   const { isLoading, error, sendRequest, clearError } = useHttpClient();
 
-  const openMapHandler = () => setShowMap(true);
+  //buy property methods
+  const showBuyWarningHandler = () => {
+    setShowConfirmModal(true);
+  };
 
-  const closeMapHandler = () => setShowMap(false);
+  const cancelBuyHandler = () => {
+    setShowConfirmModal(false);
+  };
+
+  const confirmBuyHandler = async () => {
+    setShowConfirmModal(false);
+    console.log("submitted info: "); //<--------- diagnostic ------------ DELETE ME ! ---------------------
+    try {
+      //sending http request via the [http-hook]. [sendRequest] is a pointer and take arguments for url, method, body && headers
+      await sendRequest(
+        `http://localhost:5000/api/shares/sell/${props.id}`,
+        "PATCH",
+        JSON.stringify({
+          owner: auth.userId,
+          sellPrice: props.sellPrice,
+          forSale: props.forSale,
+        }),
+        {
+          "Content-Type": "application/json",
+        }
+      );
+      //history.push("/" + auth.userId + "/shares");
+    } catch (err) {}
+  };
 
   return (
     <React.Fragment>
       <ErrorModal error={error} onClear={clearError} />
       <Modal
-        show={showMap}
-        onCancel={closeMapHandler}
-        header={props.address}
-        contentClass="property-item__modal-content"
-        footerClass="property-item__modal-actions"
-        footer={<Button onClick={closeMapHandler}>CLOSE</Button>}
+        show={showConfirmModal}
+        onCancel={cancelBuyHandler}
+        header="Are you sure?"
+        footerClass="share-market-item__modal-actions"
+        footer={
+          <React.Fragment>
+            <Button inverse onClick={cancelBuyHandler}>
+              CANCEL
+            </Button>
+            <Button danger onClick={confirmBuyHandler}>
+              BUY
+            </Button>
+          </React.Fragment>
+        }
       >
-        <div className="map-container">
-          <Map center={props.coordinates} zoom={16} />
-        </div>
+        <p>Do you want to proceed and buy this share of the property?</p>
       </Modal>
-      <li className="property-item">
-        <Card className="property-item__content">
+
+      <li className="share-market-item">
+        <Card className="share-market-item__content">
           {isLoading && <LoadingSpinner asOverlay />}
-          <div className="property-item__image">
-            <img
-              src={`http://localhost:5000/${props.image}`}
-              alt={props.title}
+          <div className="share-market-item__image">
+            <Avatar
+              image="http://localhost:5000/uploads/images/marketShare.png"
+              alt={props.propertyTitle}
             />
           </div>
-          <div className="property-item__info">
-            <h2>{props.title}</h2>
-            <h3>{props.address}</h3>
-            <p>{props.description}</p>
-            <h4>Price: {props.price}</h4>
-            <h4>For Sale: {props.availableShares}%</h4>
+          <div className="share-market-item__info">
+            <h4>Share of the property: {props.share}%</h4>
+            <h4>Asking price: {props.sellPrice}</h4>
           </div>
-          <div className="property-item__actions">
-            <Button inverse onClick={openMapHandler}>
-              VIEW ON MAP
+          <div className="share-market-item__actions">
+            {/* {auth.userId === props.owner && (
+              <Button danger onClick={showBuyWarningHandler}>
+                BUY
+              </Button>
+            )} */}
+            <Button
+              danger
+              disabled={auth.userId === props.owner}
+              onClick={showBuyWarningHandler}
+            >
+              BUY
             </Button>
           </div>
         </Card>
       </li>
     </React.Fragment>
+
+    // {/* <li className="share-item">
+    //   {loadedShare.forSale && (
+    //     <form className="share-form" onSubmit={shareUpdateSubmitHandler}>
+    //       <div className="">
+    //         <h3 className="center">FRACTION OWNERSHIP:</h3>
+    //       </div>
+    //       <div>
+    //         <h4>Share of the property: {loadedShare.share}%</h4>
+    //         <h4>Market value: {calculateCurrentPropertyValue()}</h4>
+    //         <h4>Asking price: {loadedShare.sellPrice}</h4>
+    //       </div>
+    //       <Button type="submit" onClick={showBuyWarningHandler}>
+    //         BUY
+    //       </Button>
+    //     </form>
+    //   )}
+    //   <Card className="share-item__content">
+    //     <Link to={`/shares/${props.id}`}>
+    //       <div className="share-item__image">
+    //         <Avatar
+    //           image="http://localhost:5000/uploads/images/marketShare.png"
+    //           alt={props.propertyTitle}
+    //         />
+    //       </div>
+    //       <div className="share-item__info">
+    //         <h2>{props.propertyTitle}</h2>
+    //         <h3>Cost: {props.cost}</h3>
+    //         <h3>
+    //           {" "}
+    //           Own: {props.shares} {props.shares === 1 ? "Percent" : "Percents"}
+    //         </h3>
+    //       </div>
+    //     </Link>
+    //   </Card>
+    // </li> */}
   );
 };
 
 //export function
-export default PropertyItem;
+export default ShareMarketItem;
+
+// -----------------------------------------------------------------------------------------------------------------------------------------------------------------------
 
 // /*
-//  * [PropertyItem] component is used to store and display users information
+//  * [UserPropertyItem] component is used to store and display user property information
 //  */
 
 // //import libraries
@@ -100,7 +177,7 @@ export default PropertyItem;
 // import "./PropertyItem.css";
 
 // //function
-// const PropertyItem = (props) => {
+// const UserPropertyItem = (props) => {
 //   //set up listener to the context
 //   const auth = useContext(AuthContext);
 
@@ -180,7 +257,7 @@ export default PropertyItem;
 //             <h2>{props.title}</h2>
 //             <h3>{props.address}</h3>
 //             <p>{props.description}</p>
-//             <h4>{props.price}</h4>
+//             <h4>PRICE: {props.price}</h4>
 //           </div>
 //           <div className="property-item__actions">
 //             <Button inverse onClick={openMapHandler}>
@@ -202,4 +279,4 @@ export default PropertyItem;
 // };
 
 // //export function
-// export default PropertyItem;
+// export default UserPropertyItem;

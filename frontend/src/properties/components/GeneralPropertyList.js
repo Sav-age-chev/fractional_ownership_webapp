@@ -7,7 +7,7 @@ import GeneralPropertyItem from "./GeneralProperyItem";
 import "./PropertyList.css";
 
 /*
- * [GeneralPropertyList] components used to display list of users
+ * [GeneralPropertyList] components used to display list of properties
  */
 
 const GeneralPropertyList = (props) => {

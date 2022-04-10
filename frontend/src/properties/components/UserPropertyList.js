@@ -7,7 +7,7 @@ import UserPropertyItem from "./UserPropertyItem";
 import "./PropertyList.css";
 
 /*
- * [UserPropertyList] components used to display list of users
+ * [UserPropertyList] components used to display list of user properties
  */
 
 const UserPropertyList = (props) => {

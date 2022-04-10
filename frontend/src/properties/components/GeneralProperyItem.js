@@ -25,7 +25,6 @@ const GeneralPropertyItem = (props) => {
 
   //instantiate state
   const [showMap, setShowMap] = useState(false);
-  const [showConfirmModal, setShowConfirmModal] = useState(false);
 
   //object destructuring
   const { isLoading, error, sendRequest, clearError } = useHttpClient();
@@ -33,20 +32,6 @@ const GeneralPropertyItem = (props) => {
   const openMapHandler = () => setShowMap(true);
 
   const closeMapHandler = () => setShowMap(false);
-
-  //delete property methods
-  const showSellShareWarningHandler = () => {
-    setShowConfirmModal(true);
-  };
-
-  const cancelSellShareHandler = () => {
-    setShowConfirmModal(false);
-  };
-
-  const confirmSellShareHandler = async () => {
-    setShowConfirmModal(false);
-     
-  };
 
   return (
     <React.Fragment>
@@ -62,24 +47,6 @@ const GeneralPropertyItem = (props) => {
         <div className="map-container">
           <Map center={props.coordinates} zoom={16} />
         </div>
-      </Modal>
-      <Modal
-        show={showConfirmModal}
-        onCancel={cancelSellShareHandler}
-        header="Are you sure?"
-        footerClass="property-item__modal-actions"
-        footer={
-          <React.Fragment>
-            <Button inverse onClick={cancelSellShareHandler}>
-              CANCEL
-            </Button>
-            <Button danger onClick={confirmSellShareHandler}>
-              SELL
-            </Button>
-          </React.Fragment>
-        }
-      >
-        <p>Do you want to proceed and sell the property shares?</p>
       </Modal>
       <li className="property-item">
         <Card className="property-item__content">
@@ -97,15 +64,7 @@ const GeneralPropertyItem = (props) => {
             <Button inverse onClick={openMapHandler}>
               VIEW ON MAP
             </Button>
-            <Button to={`/shares/${props.id}`}>SHARES</Button>
-            {/* {auth.isLoggedIn && (
-              <Button to={`/properties/${props.id}`}>BUY SHARE</Button>
-            )}
-            {auth.isLoggedIn && (
-              <Button danger onClick={showSellShareWarningHandler}>
-                SELL SHARE
-              </Button>
-            )} */}
+            {auth.isLoggedIn && <Button to={`/shares/property/${props.id}`}>BUY/SELL</Button>}
           </div>
         </Card>
       </li>
