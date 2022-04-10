@@ -34,15 +34,26 @@ const UserPropertyItem = (props) => {
 
   const closeMapHandler = () => setShowMap(false);
 
-  //delete property methods
+  //check if property can be deleted
+  const checkFullOwnership = () => {
+    if (props.availableShares > 100) {
+      return false;
+    } else {
+      return true;
+    }
+  };
+
+  //delete property warning
   const showDeleteWarningHandler = () => {
     setShowConfirmModal(true);
   };
 
+  //cancel property deletion
   const cancelDeleteHandler = () => {
     setShowConfirmModal(false);
   };
 
+  //delete property method
   const confirmDeleteHandler = async () => {
     setShowConfirmModal(false);
     try {
@@ -74,26 +85,40 @@ const UserPropertyItem = (props) => {
       <Modal
         show={showConfirmModal}
         onCancel={cancelDeleteHandler}
-        header="Are you sure?"
+        header="Confirmation"
         footerClass="property-item__modal-actions"
         footer={
           <React.Fragment>
             <Button inverse onClick={cancelDeleteHandler}>
               CANCEL
             </Button>
-            <Button danger onClick={confirmDeleteHandler}>
+            <Button
+              danger
+              disabled={checkFullOwnership()}
+              onClick={confirmDeleteHandler}
+            >
               DELETE
             </Button>
           </React.Fragment>
         }
       >
-        <p>Do you want to proceed and delete this property?</p>
+        {checkFullOwnership===true ? (
+          <p>Do you want to proceed and delete this property?</p>
+        ) : (
+          <p>
+            You need to be the sole owner of the property to be able to take it
+            of the market.
+          </p>
+        )}
       </Modal>
       <li className="property-item">
         <Card className="property-item__content">
           {isLoading && <LoadingSpinner asOverlay />}
           <div className="property-item__image">
-            <img src={`http://localhost:5000/${props.image}`} alt={props.title} />
+            <img
+              src={`http://localhost:5000/${props.image}`}
+              alt={props.title}
+            />
           </div>
           <div className="property-item__info">
             <h2>{props.title}</h2>

@@ -4,7 +4,7 @@
 
 //import libraries
 import React, { useState, useContext } from "react";
-import { Link } from "react-router-dom"; //Raps and renders anchor tag and block navigation logic
+import { Link, Redirect, useHistory } from "react-router-dom"; //Raps and renders anchor tag and block navigation logic
 
 //local imports
 import Card from "../../shared/components/UIElements/Card";
@@ -30,6 +30,13 @@ const ShareMarketItem = (props) => {
   //object destructuring
   const { isLoading, error, sendRequest, clearError } = useHttpClient();
 
+  //instantiating method to re-render the page
+  //const [, updateState] = React.useState();
+  //const forceUpdate = React.useCallback(() => updateState({}), []);
+
+  //storing history stack as const
+  //const historyone = useHistory(props.history);
+
   //buy property methods
   const showBuyWarningHandler = () => {
     setShowConfirmModal(true);
@@ -41,7 +48,6 @@ const ShareMarketItem = (props) => {
 
   const confirmBuyHandler = async () => {
     setShowConfirmModal(false);
-    console.log("submitted info: "); //<--------- diagnostic ------------ DELETE ME ! ---------------------
     try {
       //sending http request via the [http-hook]. [sendRequest] is a pointer and take arguments for url, method, body && headers
       await sendRequest(
@@ -50,13 +56,12 @@ const ShareMarketItem = (props) => {
         JSON.stringify({
           owner: auth.userId,
           sellPrice: props.sellPrice,
-          forSale: props.forSale,
         }),
         {
           "Content-Type": "application/json",
         }
       );
-      //history.push("/" + auth.userId + "/shares");
+      props.history.push("/properties/list");
     } catch (err) {}
   };
 
@@ -66,11 +71,11 @@ const ShareMarketItem = (props) => {
       <Modal
         show={showConfirmModal}
         onCancel={cancelBuyHandler}
-        header="Are you sure?"
+        header="Confirmation"
         footerClass="share-market-item__modal-actions"
         footer={
           <React.Fragment>
-            <Button inverse onClick={cancelBuyHandler}>
+            <Button inverse onClick={cancelBuyHandler}>›
               CANCEL
             </Button>
             <Button danger onClick={confirmBuyHandler}>
@@ -96,11 +101,6 @@ const ShareMarketItem = (props) => {
             <h4>Asking price: {props.sellPrice}</h4>
           </div>
           <div className="share-market-item__actions">
-            {/* {auth.userId === props.owner && (
-              <Button danger onClick={showBuyWarningHandler}>
-                BUY
-              </Button>
-            )} */}
             <Button
               danger
               disabled={auth.userId === props.owner}
@@ -232,7 +232,7 @@ export default ShareMarketItem;
 //       <Modal
 //         show={showConfirmModal}
 //         onCancel={cancelDeleteHandler}
-//         header="Are you sure?"
+//         header="Confirmation"
 //         footerClass="property-item__modal-actions"
 //         footer={
 //           <React.Fragment>

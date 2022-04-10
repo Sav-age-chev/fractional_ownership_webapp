@@ -137,43 +137,24 @@ const ShareMarket = () => {
   //     fetchShare();
   //   }, [sendRequest, shareId, setFormData]);
 
-  //asynchronous function for submit event
-  const propertyUpdateSubmitHandler = async (event) => {
-    event.preventDefault();
-    try {
-      //sending http request via the [http-hook]. [sendRequest] is a pointer and take arguments for url, method, body && headers
-      await sendRequest(
-        `http://localhost:5000/api/properties/${propertyId}`,
-        "PATCH",
-        JSON.stringify({
-          availableShares: formState.inputs.availableShares.value,
-        }),
-        {
-          "Content-Type": "application/json",
-        }
-      );
-      history.push("/" + auth.userId + "/properties");
-    } catch (err) {}
-  };
-
-  //asynchronous function for submit event
-  const shareUpdateSubmitHandler = async (event) => {
-    event.preventDefault();
-    // try {
-    //   //sending http request via the [http-hook]. [sendRequest] is a pointer and take arguments for url, method, body && headers
-    //   await sendRequest(
-    //     `http://localhost:5000/api/shares/edit/${shareId}`,
-    //     "PATCH",
-    //     JSON.stringify({
-    //       owner: auth.userId,
-    //     }),
-    //     {
-    //       "Content-Type": "application/json",
-    //     }
-    //   );
-    //   history.push("/" + auth.userId + "/shares");
-    // } catch (err) {}
-  };
+//   //asynchronous function for submit event
+//   const propertyUpdateSubmitHandler = async (event) => {
+//     event.preventDefault();
+//     try {
+//       //sending http request via the [http-hook]. [sendRequest] is a pointer and take arguments for url, method, body && headers
+//       await sendRequest(
+//         `http://localhost:5000/api/properties/${propertyId}`,
+//         "PATCH",
+//         JSON.stringify({
+//           availableShares: formState.inputs.availableShares.value,
+//         }),
+//         {
+//           "Content-Type": "application/json",
+//         }
+//       );
+//       history.push("/" + auth.userId + "/properties");
+//     } catch (err) {}
+//   };
 
   //return spinner while [isLoading] is true
   if (isLoading) {
@@ -225,30 +206,29 @@ const ShareMarket = () => {
         `http://localhost:5000/api/shares/buy/${propertyId}`,
         "POST",
         JSON.stringify({
-          owner: "623a4c4e48c6557b3500df49",
-          shareProperty: "623a4c7648c6557b3500df4c",
-          propertyTitle: "Tattu",
+          owner: auth.userId,
+          shareProperty: propertyId,
+          propertyTitle: loadedProperty.title,
           cost: "35300",
-          share: "2",
+          share: formState.inputs.share.value,
         }),
         {
           "Content-Type": "application/json",
         }
       );
-      //console.log("CONFIRM BUY!" + auth.userId + " " + propertyId + " " + loadedProperty.title + " " + formState.inputs.share.value + " " + shareCost) // <---------------- diagnostic ----------------- DELETE ME -------------
     } catch (err) {}
   };
 
-  let shareCost = 0.0;
-
   //calculate current value
   const calculateShareCost = () => {
-    let shareCost = 0.0;
+    let shareCost = 0.00;
     if (loadedProperty) {
       shareCost = parseFloat(
-        (formState.inputs.share.value / 100) * loadedProperty.price
+        // (formState.inputs.share.value / 100) * loadedProperty.price
+        (20 / 100) * loadedProperty.price
       ).toFixed(2);
     }
+    return shareCost;
   };
 
   //function triggered upon sell that filter the share list by comparing against the id of recently deleted
@@ -266,7 +246,7 @@ const ShareMarket = () => {
       <Modal
         show={showConfirmModal}
         onCancel={cancelBuyHandler}
-        header="Are you sure?"
+        header="Confirmation"
         footerClass="share-item__modal-actions"
         footer={
           <React.Fragment>
@@ -314,11 +294,10 @@ const ShareMarket = () => {
             validators={[VALIDATOR_REQUIRE()]}
             errorText="Please enter a valid number."
             onInput={inputHandler}
-            onChange={calculateShareCost}
             initialValue={loadedProperty.availableShares}
             initialValid={true}
           />
-          <h4>Cost: {shareCost}</h4>
+          <h4>Cost: {calculateShareCost()}</h4>
           <div className="share-item__actions">
             <Button type="submit" onClick={showBuyWarningHandler}>
               BUY
@@ -329,7 +308,7 @@ const ShareMarket = () => {
 
       <div className="marketplace">
         <h3 className="center">MARKETPLACE: </h3>
-        <ShareMarketList items={loadedShares} onSoldShare={soldShareHandler} />
+        <ShareMarketList items={loadedShares} history={history} onSoldShare={soldShareHandler} />
       </div>
 
       {/* <div className="marketplace">

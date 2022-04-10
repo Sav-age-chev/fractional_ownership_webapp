@@ -74,7 +74,7 @@ const MarketPropertyItem = (props) => {
       <Modal
         show={showConfirmModal}
         onCancel={cancelDeleteHandler}
-        header="Are you sure?"
+        header="Confirmation"
         footerClass="property-item__modal-actions"
         footer={
           <React.Fragment>
@@ -178,7 +178,7 @@ export default MarketPropertyItem;
 //       <Modal
 //         show={showConfirmModal}
 //         onCancel={cancelSellHandler}
-//         header="Are you sure?"
+//         header="Confirmation"
 //         footerClass="property-item__modal-actions"
 //         footer={
 //           <React.Fragment>

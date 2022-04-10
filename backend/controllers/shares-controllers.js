@@ -431,12 +431,12 @@ const updateSharesOwner = async (req, res, next) => {
   }
 
   //get data from the body
-  const { owner } = req.body;
+  const { owner, sellPrice } = req.body;
   //get id from the url
   const shareId = req.params.sid;
 
   console.log(
-    "Passed data to shareUpdate: " + owner + " " + forSale + " " + shareId
+    "Passed data to shareUpdate: " + owner + " - " + sellPrice + " - " + shareId
   ); // <----------------------- DELETE ME ! --------------------------
 
   //instantiating new variable with a scope of the method
@@ -451,6 +451,18 @@ const updateSharesOwner = async (req, res, next) => {
     );
     return next(error);
   }
+
+  //-------------------------------------------------------------------------------------------------------------------
+  // try {
+  //   share = await Share.findById(shareId);
+  // } catch (err) {
+  //   const error = new HttpError(
+  //     "Something went wrong, could not update your share of the property.",
+  //     500
+  //   );
+  //   return next(error);
+  // }
+  //-------------------------------------------------------------------------------------------------------------------
 
   //check if share exist
   if (!share) {
@@ -475,19 +487,57 @@ const updateSharesOwner = async (req, res, next) => {
     return next(error);
   }
 
-  //check if new user has been retrieved
-  if (!user) {
-    const error = new HttpError("Could not find user for the provided id", 404);
-    return next(error);
-  }
+  //-------------------------------------------------------------------------------------------------------------------
+  // //check if new user has been retrieved
+  // if (!user) {
+  //   const error = new HttpError("Could not find user for the provided id", 404);
+  //   return next(error);
+  // }
+
+  // let oldUser;
+  // //retrieving the new user
+  // try {
+  //   oldUser = await User.findById(share.owner);
+  // } catch (err) {
+  //   const error = new HttpError(
+  //     "Something went wrong, could not retrieve the old user data.",
+  //     500
+  //   );
+  //   return next(error);
+  // }
+
+  // //check if new oldUser has been retrieved
+  // if (!oldUser) {
+  //   const error = new HttpError("Could not find old user for the provided id", 404);
+  //   return next(error);
+  // }
+  //-------------------------------------------------------------------------------------------------------------------
 
   //updating details
-  if (forSale) {
-    share.forSale = !share.forSale;
-  }
+  share.forSale = !share.forSale;
+  share.cost = sellPrice;
 
   //try to save the newly updated share into the database with asynchronous method. Catch and displays error if it fails
   try {
+    //-------------------------------------------------------------------------------------------------------------------
+    // //starting new session
+    // const sess = await mongoose.startSession();
+    // //starting a transaction
+    // sess.startTransaction();
+    // //update the owner field in share
+    // share.owner = user;
+    // //save share
+    // await share.save();
+    // //remove share from the old user array
+    // oldUser.userShares.pull(share);
+    // //saves the update
+    // await oldUser.save({ session: sess });
+    // //add share to the new user array
+    // user.userShares.push(share);
+    // //saves the update
+    // await user.save();
+    // //update the owner field in share
+    //-------------------------------------------------------------------------------------------------------------------
     //starting new session
     const sess = await mongoose.startSession();
     //starting a transaction
@@ -502,7 +552,7 @@ const updateSharesOwner = async (req, res, next) => {
     user.userShares.push(share);
     //saves the update
     await user.save();
-    //updating share's field
+    //update the owner field in share
     share.owner = user;
     //save share
     await share.save();

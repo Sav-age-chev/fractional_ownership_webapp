@@ -56,7 +56,7 @@ const UpdateShareItem = (props) => {
       <Modal
         show={showConfirmModal}
         onCancel={cancelSellHandler}
-        header="Are you sure?"
+        header="Confirmation"
         footerClass="share-item__modal-actions"
         footer={
           <React.Fragment>

@@ -155,7 +155,7 @@ export default PropertyItem;
 //       <Modal
 //         show={showConfirmModal}
 //         onCancel={cancelDeleteHandler}
-//         header="Are you sure?"
+//         header="Confirmation"
 //         footerClass="property-item__modal-actions"
 //         footer={
 //           <React.Fragment>

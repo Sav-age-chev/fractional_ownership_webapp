@@ -25,6 +25,8 @@ const ShareMarketList = (props) => {
     );
   }
 
+  console.log(props.history);
+
   return (
     <ul className="shares-list">
       {props.items.map((share) => (
@@ -39,6 +41,7 @@ const ShareMarketList = (props) => {
           sellPrice={share.sellPrice}
           forSale={share.ForSale}
           onSell={props.onSoldShare}
+          history={props.history}
         />
       ))}
     </ul>
