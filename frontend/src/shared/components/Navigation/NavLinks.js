@@ -24,7 +24,7 @@ const NavLinks = (props) => {
       )}
       {auth.isLoggedIn && (
         <li>
-          <NavLink to={`/${auth.userId}/properties`}>MY ADVERTS</NavLink>
+          <NavLink to={`/${auth.userId}/properties`}>MY POSTS</NavLink>
         </li>
       )}
       {auth.isLoggedIn && (

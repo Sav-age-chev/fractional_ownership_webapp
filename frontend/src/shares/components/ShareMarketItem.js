@@ -54,11 +54,12 @@ const ShareMarketItem = (props) => {
         `http://localhost:5000/api/shares/sell/${props.id}`,
         "PATCH",
         JSON.stringify({
-          owner: auth.userId,
+          //owner: auth.userId,
           sellPrice: props.sellPrice,
         }),
         {
           "Content-Type": "application/json",
+          Authorization: "Bearer " + auth.token,
         }
       );
       props.history.push("/properties/list");
@@ -75,8 +76,8 @@ const ShareMarketItem = (props) => {
         footerClass="share-market-item__modal-actions"
         footer={
           <React.Fragment>
-            <Button inverse onClick={cancelBuyHandler}>›
-              CANCEL
+            <Button inverse onClick={cancelBuyHandler}>
+              › CANCEL
             </Button>
             <Button danger onClick={confirmBuyHandler}>
               BUY

@@ -125,11 +125,15 @@ const getSharesByPropertyId = async (req, res, next) => {
 
 //buy property share
 const buyPropertyShare = async (req, res, next) => {
-  const { owner, shareProperty, propertyTitle, cost, share } = req.body;
+
+  //object destructuring
+  const { shareProperty, propertyTitle, cost, share } = req.body; 
+
+  //get userId from the authorisation token as it is more secure
+  const owner = req.userData.userId;
+
   console.log(
     "Request body: " +
-      owner +
-      " " +
       shareProperty +
       " " +
       propertyTitle +
@@ -138,6 +142,7 @@ const buyPropertyShare = async (req, res, next) => {
       " " +
       share
   ); // <---------- diagnostic ---------- PLEASE DELETE ME ! ---------
+
   //check validation results and return error in case is not empty
   const errors = validationResult(req);
   if (!errors.isEmpty()) {
@@ -221,9 +226,21 @@ const buyPropertyShare = async (req, res, next) => {
     return next(error);
   }
 
-  //diagnostic
-  console.log(createdShare); // <----------------------- DELETE ME ! -------------------------------------------
+  console.log(
+    "Update share owner" + user.id.toString() + " = " + req.userData.userId
+  ); // <-------- diagnostic -------- DELETE ME ! ----------------------------------------------------------
 
+  //checking if the creator user has sent the request
+  if (user.id.toString() !== req.userData.userId) {
+    const error = new HttpError(
+      "User not authorised to purchase this share.",
+      401
+    );
+    return next(error);
+  }
+
+  //try to create new share in the database with the async method [save()]. Catch and display error if fail
+  // NOTE: if dont have collection, will have to be created manually !!
   try {
     //starting session
     const sess = await mongoose.startSession();
@@ -331,12 +348,12 @@ const updateShare = async (req, res, next) => {
   }
 
   //get data from the body
-  const { owner, sellPrice, forSale } = req.body;
+  const { sellPrice, forSale } = req.body;
   //get id from the url
   const shareId = req.params.sid;
 
   console.log(
-    "Passed data to shareUpdate: " + owner + " " + forSale + " " + shareId
+    "Passed data to shareUpdate: " + forSale + " " + shareId
   ); // <----------------------- DELETE ME ! --------------------------
 
   //instantiating new variable with a scope of the method
@@ -372,6 +389,19 @@ const updateShare = async (req, res, next) => {
     return next(error);
   }
 
+  console.log(
+    "Update share " + share.owner.toString() + " = " + req.userData.userId
+  ); // <-------- diagnostic -------- DELETE ME ! ----------------------------------------------------------
+
+  //checking if the creator user has sent the request
+  if (share.owner.toString() !== req.userData.userId) {
+    const error = new HttpError(
+      "User not authorised to amend this share.",
+      401
+    );
+    return next(error);
+  }
+
   //get user if the share change ownership
   // if (share.owner != owner) {
   //   //check if the provided user id exists
@@ -397,13 +427,12 @@ const updateShare = async (req, res, next) => {
   // }
 
   //updating details
-  share.owner = owner;
   if (forSale) {
     share.forSale = !share.forSale;
     share.sellPrice = sellPrice;
   }
 
-  //try to save the newly updated share into the database with asynchronous method. Catch and displays error if it fails
+  //try to amend share in the database with the async method [save()]. Catch and display error if fail
   try {
     await share.save();
   } catch (err) {
@@ -431,7 +460,9 @@ const updateSharesOwner = async (req, res, next) => {
   }
 
   //get data from the body
-  const { owner, sellPrice } = req.body;
+  const { sellPrice } = req.body; //owner
+  //retrieving the user id from the token once decoded
+  const owner = req.userData.userId;
   //get id from the url
   const shareId = req.params.sid;
 
@@ -487,13 +518,26 @@ const updateSharesOwner = async (req, res, next) => {
     return next(error);
   }
 
-  //-------------------------------------------------------------------------------------------------------------------
-  // //check if new user has been retrieved
-  // if (!user) {
-  //   const error = new HttpError("Could not find user for the provided id", 404);
-  //   return next(error);
-  // }
+  //check if new user has been retrieved
+  if (!user) {
+    const error = new HttpError("Could not find user for the provided id", 404);
+    return next(error);
+  }
 
+  console.log(
+    "Update share owner" + user.id.toString() + " = " + req.userData.userId
+  ); // <-------- diagnostic -------- DELETE ME ! ----------------------------------------------------------
+
+  //checking if the creator user has sent the request
+  if (user.id.toString() !== req.userData.userId.toString()) {
+    const error = new HttpError(
+      "User not authorised to purchase this share.",
+      401
+    );
+    return next(error);
+  }
+
+  //-------------------------------------------------------------------------------------------------------------------
   // let oldUser;
   // //retrieving the new user
   // try {
@@ -517,7 +561,7 @@ const updateSharesOwner = async (req, res, next) => {
   share.forSale = !share.forSale;
   share.cost = sellPrice;
 
-  //try to save the newly updated share into the database with asynchronous method. Catch and displays error if it fails
+  //try to amend share in the database with the async method [save()]. Catch and display error if fail
   try {
     //-------------------------------------------------------------------------------------------------------------------
     // //starting new session

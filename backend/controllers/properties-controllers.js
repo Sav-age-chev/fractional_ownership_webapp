@@ -4,7 +4,7 @@
 
 //import libraries
 //const uuid = require("uuid"); //generates IDs -----> D E L E T E   M E   A T   S O M E   P O I N T ! <-----
-const fs = require('fs');
+const fs = require("fs");
 const { validationResult } = require("express-validator");
 const mongoose = require("mongoose");
 
@@ -36,8 +36,7 @@ const Share = require("../models/share");
 //   });
 // };
 const getAllProperties = async (req, res, next) => {
-
-  console.log("getAllProperties - Hello1");   // <-------- diagnostic -------- DELETE ME ! ----------------------------------------------------------
+  console.log("getAllProperties - Hello1"); // <-------- diagnostic -------- DELETE ME ! ----------------------------------------------------------
 
   //instantiating new variable with a scope of the method
   let properties;
@@ -56,9 +55,7 @@ const getAllProperties = async (req, res, next) => {
 
   //returns error in case no properties was found
   if (!properties || properties.length === 0) {
-    return next(
-      new HttpError("Could not find any properties", 404)
-    );
+    return next(new HttpError("Could not find any properties", 404));
   }
 
   //response to the request. Using [map] as we browse trough an array. Then covert to JavaScript object and activate the getters to get rid of the underscore
@@ -68,7 +65,7 @@ const getAllProperties = async (req, res, next) => {
   //   ),
   // });
   res.json({
-      properties: properties.map((property) =>
+    properties: properties.map((property) =>
       property.toObject({ getters: true })
     ),
   });
@@ -182,7 +179,9 @@ const getPropertyByShareId = async (req, res, next) => {
   }
 
   //response to the request. Covert [property] to JavaScript object. {getters: true} removes the underscore from the id
-  res.json({ property: tempShareProperty.shareProperty.toObject({ getters: true }) });
+  res.json({
+    property: tempShareProperty.shareProperty.toObject({ getters: true }),
+  });
 
   //response to the request. Using [map] as we browse trough an array. Then covert to JavaScript object and activate the getters to get rid of the underscore
   // res.json({
@@ -208,8 +207,10 @@ const createProperty = async (req, res, next) => {
   }
 
   //object destructuring
-  const { title, description, address, creator, price } =
-    req.body;
+  const { title, description, address, price } = req.body;
+
+  //retrieving the userId from the authorisation token instead the body of the request, as it is more secure
+  const creator = req.userData.userId;
 
   //convert address to coordinates
   let coordinates;
@@ -228,9 +229,9 @@ const createProperty = async (req, res, next) => {
     address,
     location: coordinates,
     image: req.file.path,
-    //image, 
+    //image,
     //image: "uploads/images/510e23c0-9fde-11ec-808e-79d66390cc23.png",
-    creator,
+    creator: req.userData.userId,
     //--------------------FOW-------------------------
     propertyShares: [],
     price,
@@ -264,19 +265,19 @@ const createProperty = async (req, res, next) => {
   console.log(user);
 
   //try to add new property to the database with the async method [save()]. Catch and display error if fail
-  // NOTE: if we dont have collection [properties], will have to created manually !!!
+  // NOTE: if we dont have collection, will have to created manually !!!
   try {
     //starting session
     const sess = await mongoose.startSession();
     //starting a transaction
     sess.startTransaction();
     //saves the property
-    //await createdProperty.save(); 
+    //await createdProperty.save();
     await createdProperty.save({ session: sess });
     //adding the property id to the user
     user.properties.push(createdProperty);
     //saves the user
-    //await user.save(); 
+    //await user.save();
     await user.save({ session: sess });
     //session commits the transaction if all previous commands has been executed successfully
     await sess.commitTransaction();
@@ -500,7 +501,6 @@ const createProperty = async (req, res, next) => {
 
 //update existing property
 const updateProperty = async (req, res, next) => {
-  
   //check validation results and return error in case is not empty
   const errors = validationResult(req);
   if (!errors.isEmpty()) {
@@ -528,7 +528,16 @@ const updateProperty = async (req, res, next) => {
     return next(error);
   }
 
-  //
+  //checking if the creator user has sent the request
+  if (property.creator.toString() !== req.userData.userId) {
+    const error = new HttpError(
+      "User not authorised to amend this property.",
+      401
+    );
+    return next(error);
+  }
+
+  //updating object
   property.title = title;
   property.description = description;
 
@@ -575,6 +584,19 @@ const deleteProperty = async (req, res, next) => {
     return next(error);
   }
 
+  console.log(
+    "Delete property: " + property.creator + " = " + req.userData.userId
+  ); // <-------- diagnostic -------- DELETE ME ! ----------------------------------------------------------
+
+  //checking if the creator user has sent the request
+  if (property.creator.id !== req.userData.userId) {
+    const error = new HttpError(
+      "User not authorised to delete this property.",
+      401
+    );
+    return next(error);
+  }
+
   //get the image path
   const imagePath = property.image;
 
@@ -600,9 +622,9 @@ const deleteProperty = async (req, res, next) => {
   }
 
   //delete image if the execution reach this point
-  fs.unlink(imagePath, err => {
+  fs.unlink(imagePath, (err) => {
     console.log(err);
-  })
+  });
 
   //response to the request
   res.status(200).json({ message: "Property deleted." });

@@ -9,6 +9,7 @@ const { check } = require("express-validator");
 //local imports
 const fileUpload = require("../middleware/file-upload");
 const propertiesControllers = require("../controllers/properties-controllers");
+const checkAuth = require("../middleware/check-auth");
 
 //instantiating [router] object
 const router = express.Router();
@@ -24,6 +25,9 @@ router.get("/share/:sid", propertiesControllers.getPropertyByShareId);
 
 //get property by user id. Uses pointer to a function and not executing it ()
 router.get("/user/:uid", propertiesControllers.getPropertiesByUserId);
+
+//adding a validating middleware. Only request with tokens would be authorised below this point
+router.use(checkAuth);
 
 //add a new property. First execute methods to validate the input and then uses pointer to a function and not executing it ()
 router.post(

@@ -137,24 +137,24 @@ const ShareMarket = () => {
   //     fetchShare();
   //   }, [sendRequest, shareId, setFormData]);
 
-//   //asynchronous function for submit event
-//   const propertyUpdateSubmitHandler = async (event) => {
-//     event.preventDefault();
-//     try {
-//       //sending http request via the [http-hook]. [sendRequest] is a pointer and take arguments for url, method, body && headers
-//       await sendRequest(
-//         `http://localhost:5000/api/properties/${propertyId}`,
-//         "PATCH",
-//         JSON.stringify({
-//           availableShares: formState.inputs.availableShares.value,
-//         }),
-//         {
-//           "Content-Type": "application/json",
-//         }
-//       );
-//       history.push("/" + auth.userId + "/properties");
-//     } catch (err) {}
-//   };
+  //   //asynchronous function for submit event
+  //   const propertyUpdateSubmitHandler = async (event) => {
+  //     event.preventDefault();
+  //     try {
+  //       //sending http request via the [http-hook]. [sendRequest] is a pointer and take arguments for url, method, body && headers
+  //       await sendRequest(
+  //         `http://localhost:5000/api/properties/${propertyId}`,
+  //         "PATCH",
+  //         JSON.stringify({
+  //           availableShares: formState.inputs.availableShares.value,
+  //         }),
+  //         {
+  //           "Content-Type": "application/json",
+  //         }
+  //       );
+  //       history.push("/" + auth.userId + "/properties");
+  //     } catch (err) {}
+  //   };
 
   //return spinner while [isLoading] is true
   if (isLoading) {
@@ -187,17 +187,19 @@ const ShareMarket = () => {
   //     );
   //   }
 
-  //buy property methods
+  //buy warning
   const showBuyWarningHandler = (event) => {
     //prevent the default submission of the form
     event.preventDefault();
     setShowConfirmModal(true);
   };
 
+  //cancel the purchase
   const cancelBuyHandler = () => {
     setShowConfirmModal(false);
   };
 
+  //once confirmed, request is send to buy property from initial sale
   const confirmBuyHandler = async () => {
     setShowConfirmModal(false);
     try {
@@ -206,7 +208,7 @@ const ShareMarket = () => {
         `http://localhost:5000/api/shares/buy/${propertyId}`,
         "POST",
         JSON.stringify({
-          owner: auth.userId,
+          //owner: auth.userId,
           shareProperty: propertyId,
           propertyTitle: loadedProperty.title,
           cost: "35300",
@@ -214,14 +216,16 @@ const ShareMarket = () => {
         }),
         {
           "Content-Type": "application/json",
+          Authorization: "Bearer " + auth.token,
         }
       );
+      history.push("/" + auth.userId + "/shares");
     } catch (err) {}
   };
 
   //calculate current value
   const calculateShareCost = () => {
-    let shareCost = 0.00;
+    let shareCost = 0.0;
     if (loadedProperty) {
       shareCost = parseFloat(
         // (formState.inputs.share.value / 100) * loadedProperty.price
@@ -308,7 +312,11 @@ const ShareMarket = () => {
 
       <div className="marketplace">
         <h3 className="center">MARKETPLACE: </h3>
-        <ShareMarketList items={loadedShares} history={history} onSoldShare={soldShareHandler} />
+        <ShareMarketList
+          items={loadedShares}
+          history={history}
+          onSoldShare={soldShareHandler}
+        />
       </div>
 
       {/* <div className="marketplace">
