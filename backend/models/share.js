@@ -16,6 +16,8 @@ const shareSchema = new Schema({
     required: true,
     ref: "Property",
   },
+  propertyTitle: { type: String, required: true },
+  cost: { type: Number, required: true },
   share: { type: Number, required: true },
 });
 

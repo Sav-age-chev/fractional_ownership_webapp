@@ -1,14 +1,18 @@
-import React from "react";
-
-import UserItem from "./UserItem";
-import Card from "../../shared/components/UIElements/Card";
-
-import "./UsersList.css";
-
 /*
  * [UsersList] components used to display list of users
  */
 
+//import libraries
+import React from "react";
+
+//local imports
+import UserItem from "./UserItem";
+import Card from "../../shared/components/UIElements/Card";
+
+//stylesheet
+import "./UsersList.css";
+
+//function
 const UsersList = (props) => {
   if (props.items.length === 0) {
     return (
@@ -35,4 +39,5 @@ const UsersList = (props) => {
   );
 };
 
+//export function
 export default UsersList;

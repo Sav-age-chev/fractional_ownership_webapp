@@ -2,7 +2,7 @@ import React from "react";
 
 import Card from "../../shared/components/UIElements/Card";
 import Button from "../../shared/components/FormElements/Button";
-import PropertyItem from "./PropertyItem";
+import UserPropertyItem from "./UserPropertyItem";
 
 import "./PropertyList.css";
 
@@ -25,7 +25,7 @@ const PropertyList = (props) => {
   return (
     <ul className="property-list">
       {props.items.map((property) => (
-        <PropertyItem
+        <UserPropertyItem
           key={property.id}
           id={property.id}
           image={property.image}

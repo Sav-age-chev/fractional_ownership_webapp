@@ -1,5 +1,5 @@
 /*
- * [PropertyItem] component is used to store and display users information
+ * [PropertyItem] component is used to store and display user property information
  */
 
 //import libraries
@@ -19,7 +19,7 @@ import { useHttpClient } from "../../shared/hooks/http-hook";
 import "./PropertyItem.css";
 
 //function
-const PropertyItem = (props) => {
+const UserPropertyItem = (props) => {
   //set up listener to the context
   const auth = useContext(AuthContext);
 
@@ -99,7 +99,7 @@ const PropertyItem = (props) => {
             <h2>{props.title}</h2>
             <h3>{props.address}</h3>
             <p>{props.description}</p>
-            <h4>{props.price}</h4>
+            <h4>PRICE: {props.price}</h4>
           </div>
           <div className="property-item__actions">
             <Button inverse onClick={openMapHandler}>
@@ -121,4 +121,4 @@ const PropertyItem = (props) => {
 };
 
 //export function
-export default PropertyItem;
+export default UserPropertyItem;

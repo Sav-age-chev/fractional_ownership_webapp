@@ -64,6 +64,8 @@ const getSharesByUserId = async (req, res, next) => {
     return next(error);
   }
 
+  console.log(userWithShares); // <------- diagnostic --------- PLEASE DELETE ME ! ----------
+
   //returns error in case no share was found
   if (!userWithShares || userWithShares.userShares.length === 0) {
     return next(
@@ -73,7 +75,7 @@ const getSharesByUserId = async (req, res, next) => {
 
   //response to the request. Using [map] as we browse trough an array. Then covert to JavaScript object and activate the getters to get rid of the underscore
   res.json({
-    userShares: userWithShares.userShares.map((share) =>
+    shares: userWithShares.userShares.map((share) =>
       share.toObject({ getters: true })
     ),
   });
@@ -90,30 +92,40 @@ const buyPropertyShare = async (req, res, next) => {
   }
 
   //get data from the body
-  const { share, owner } = req.body;
+  const { owner, shareProperty, propertyTitle, cost, share } = req.body;
   //get id from the url
-  const shareProperty = req.params.pid;
-
-  //instantiating new object using the blueprint from models
-  const createdShare = new Share({
-    owner,
-    shareProperty,
-    share,
-  });
+  const propertyId = req.params.pid;
 
   //instantiating new variable with a scope of the method
   let property;
+
+  console.log(propertyId); // <---------- diagnostic ---------- PLEASE DELETE ME ! ---------
+
+  //instantiating new object using the blueprint from models
+  const createdShare = new Share({
+    owner, //owner == owner: owner
+    shareProperty,
+    propertyTitle,
+    //propertyTitle: property.title,
+    cost,
+    share,
+  });
+
+  console.log(createdShare); // <---------- diagnostic ---------- PLEASE DELETE ME ! ---------
 
   //try to get property by id from database with an asynchronous method. Catch and displays error if it fail
   try {
     property = await Property.findById(shareProperty);
   } catch (err) {
+    console.log("We have a problem here!"); // <---------- diagnostic ---------- PLEASE DELETE ME ! ---------
     const error = new HttpError(
       "Something went wrong, could not retrieve the property data.",
       500
     );
     return next(error);
   }
+
+  console.log(property); // <---------- diagnostic ---------- PLEASE DELETE ME ! ---------
 
   //returns error if property variable is empty or there not enough available shares
   if (!property) {
@@ -141,16 +153,16 @@ const buyPropertyShare = async (req, res, next) => {
   try {
     user = await User.findById(owner);
   } catch (err) {
-    const error = new HttpError("Something went wrong, could not retrieve the user data.", 500);
+    const error = new HttpError(
+      "Something went wrong, could not retrieve the user data.",
+      500
+    );
     return next(error);
   }
 
   //check if user has been retrieved
   if (!user) {
-    const error = new HttpError(
-      "Could not find user for the provided id",
-      404
-    );
+    const error = new HttpError("Could not find user for the provided id", 404);
     return next(error);
   }
 

@@ -15,6 +15,7 @@ import {
 //local imports
 import Auth from "./user/pages/Auth";
 import Users from "./user/pages/Users";
+import Shares from "./shares/pages/Shares";
 import NewProperty from "./properties/pages/NewProperty";
 import AllProperties from "./properties/pages/AllProperties";
 import UpdateProperty from "./properties/pages/UpdateProperty";
@@ -51,9 +52,17 @@ const App = () => {
         <Route path="/" exact>
           <Users />
         </Route>
+        {/* Create exact routing. "/user/:userId" is a filter */}
+        <Route path="/shares/user/:userId" exact>
+          <Shares />
+        </Route>
         {/* Create exact routing. "/:userId/properties" is a filter */}
         <Route path="/:userId/properties" exact>
           <UserProperties />
+        </Route>
+        {/* Create exact routing. "/user/:userId/shareId" is a filter */}
+        <Route path="/shares/:shareId" exact>
+          <AllProperties />
         </Route>
         {/* Create exact routing. "/properties/new" is a filter */}
         <Route path="/properties/new" exact>

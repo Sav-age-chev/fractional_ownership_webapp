@@ -1,5 +1,5 @@
 /*
- * [PropertyItem] component is used to store and display users information
+ * [GeneralPropertyItem] component is used to store and display general property information
  */
 
 //import libraries
@@ -19,7 +19,7 @@ import { useHttpClient } from "../../shared/hooks/http-hook";
 import "./PropertyItem.css";
 
 //function
-const PropertyItem = (props) => {
+const GeneralPropertyItem = (props) => {
   //set up listener to the context
   const auth = useContext(AuthContext);
 
@@ -35,25 +35,17 @@ const PropertyItem = (props) => {
   const closeMapHandler = () => setShowMap(false);
 
   //delete property methods
-  const showDeleteWarningHandler = () => {
+  const showSellShareWarningHandler = () => {
     setShowConfirmModal(true);
   };
 
-  const cancelDeleteHandler = () => {
+  const cancelSellShareHandler = () => {
     setShowConfirmModal(false);
   };
 
-  const confirmDeleteHandler = async () => {
+  const confirmSellShareHandler = async () => {
     setShowConfirmModal(false);
-    try {
-      //send http request via [http-hook] to the backend to delete the property
-      await sendRequest(
-        `http://localhost:5000/api/properties/${props.id}`,
-        "DELETE"
-      );
-      console.log("PropertyItem: " + props.id); //<--------- diagnostic ------------ DELETE ME ! ---------------------
-      props.onDelete(props.id);
-    } catch (err) {}
+     
   };
 
   return (
@@ -73,21 +65,21 @@ const PropertyItem = (props) => {
       </Modal>
       <Modal
         show={showConfirmModal}
-        onCancel={cancelDeleteHandler}
+        onCancel={cancelSellShareHandler}
         header="Are you sure?"
         footerClass="property-item__modal-actions"
         footer={
           <React.Fragment>
-            <Button inverse onClick={cancelDeleteHandler}>
+            <Button inverse onClick={cancelSellShareHandler}>
               CANCEL
             </Button>
-            <Button danger onClick={confirmDeleteHandler}>
-              DELETE
+            <Button danger onClick={confirmSellShareHandler}>
+              SELL
             </Button>
           </React.Fragment>
         }
       >
-        <p>Do you want to proceed and delete this property?</p>
+        <p>Do you want to proceed and sell the property shares?</p>
       </Modal>
       <li className="property-item">
         <Card className="property-item__content">
@@ -99,18 +91,18 @@ const PropertyItem = (props) => {
             <h2>{props.title}</h2>
             <h3>{props.address}</h3>
             <p>{props.description}</p>
-            <h4>{props.price}</h4>
+            <h4>PRICE: {props.price}</h4>
           </div>
           <div className="property-item__actions">
             <Button inverse onClick={openMapHandler}>
               VIEW ON MAP
             </Button>
-            {auth.userId === props.creatorId && (
-              <Button to={`/properties/${props.id}`}>EDIT</Button>
+            {auth.isLoggedIn && (
+              <Button to={`/properties/${props.id}`}>BUY SHARE</Button>
             )}
-            {auth.userId === props.creatorId && (
-              <Button danger onClick={showDeleteWarningHandler}>
-                DELETE
+            {auth.isLoggedIn && (
+              <Button danger onClick={showSellShareWarningHandler}>
+                SELL SHARE
               </Button>
             )}
           </div>
@@ -121,4 +113,4 @@ const PropertyItem = (props) => {
 };
 
 //export function
-export default PropertyItem;
+export default GeneralPropertyItem;
