@@ -32,6 +32,7 @@ const PropertyList = (props) => {
           title={property.title}
           description={property.description}
           address={property.address}
+          price={property.price}
           creatorId={property.creator}
           coordinates={property.location}
           onDelete={props.onDeleteProperty}

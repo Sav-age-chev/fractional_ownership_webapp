@@ -16,6 +16,7 @@ import {
 import Auth from "./user/pages/Auth";
 import Users from "./user/pages/Users";
 import NewProperty from "./properties/pages/NewProperty";
+import AllProperties from "./properties/pages/AllProperties";
 import UpdateProperty from "./properties/pages/UpdateProperty";
 import UserProperties from "./properties/pages/UserProperties";
 import MainNavigation from "./shared/components/Navigation/MainNavigation";
@@ -46,49 +47,52 @@ const App = () => {
   if (isLoggedIn) {
     routes = (
       <Switch>
+        {/* Create exact routing. "/" is a filter */}
         <Route path="/" exact>
-          {" "}
-          {/* Create exact routing. "/" is a filter */}
           <Users />
         </Route>
+        {/* Create exact routing. "/:userId/properties" is a filter */}
         <Route path="/:userId/properties" exact>
-          {" "}
-          {/* Create exact routing. "/" is a filter */}
           <UserProperties />
         </Route>
+        {/* Create exact routing. "/properties/new" is a filter */}
         <Route path="/properties/new" exact>
-          {" "}
-          {/* Create exact routing. "/" is a filter */}
           <NewProperty />
         </Route>
-        <Route path="/properties/:propertyId">
-          {" "}
-          {/* /properties/:propertyId should be after /properties/new, else  */}
-          <UpdateProperty />{" "}
-          {/* will be interpreted as the first route. Create exact routing. "/" is a filter */}
+        {/* Create exact routing. "/properties/new" is a filter */}
+        <Route path="/properties/list" exact>
+          <AllProperties />
         </Route>
-        <Redirect to="/" />{" "}
+        {/* /properties/:propertyId should be after /properties/new, else  */}
+        {/* will be interpreted as the first route. Create exact routing. "/" is a filter */}
+        <Route path="/properties/:propertyId">
+          <UpdateProperty />
+        </Route>
         {/* If the path after the / is invalid user will be redirected back */}
+        <Redirect to="/" />
       </Switch>
     );
   } else {
     routes = (
       <Switch>
+        {/* Create exact routing. "/" is a filter */}
         <Route path="/" exact>
-          {" "}
-          {/* Create exact routing. "/" is a filter */}
           <Users />
         </Route>
+        {/* Create exact routing. "/properties/new" is a filter */}
+        <Route path="/properties/list" exact>
+          <AllProperties />
+        </Route>
+        {/* Create exact routing. "/" is a filter */}
         <Route path="/:userId/properties" exact>
-          {" "}
-          {/* Create exact routing. "/" is a filter */}
           <UserProperties />
         </Route>
+        {/* Create routing. "/auth" is a filter */}
         <Route path="/auth">
           <Auth />
         </Route>
-        <Redirect to="/auth" />{" "}
         {/* If the path after the / is invalid user will be redirected back */}
+        <Redirect to="/auth" />
       </Switch>
     );
   }
