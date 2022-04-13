@@ -9,7 +9,7 @@ import { useState, useCallback, useEffect } from "react";
 let logoutTimer;
 
 //function managing login/logout states
-export const userAuth = () => {
+export const useAuth = () => {
   //instantiating states
   const [token, setToken] = useState(false);
   const [userId, setUserId] = useState(false);
@@ -18,7 +18,7 @@ export const userAuth = () => {
   //login function
   const login = useCallback((uid, token, expirationDate) => {
     //manage states
-    setToken(token);
+    setToken(token);    
     setUserId(uid);
     //setting token expiration time
     const tokenExpirationDate =

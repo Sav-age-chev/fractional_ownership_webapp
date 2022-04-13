@@ -23,7 +23,7 @@ import AllProperties from "./properties/pages/AllProperties";
 import UpdateProperty from "./properties/pages/UpdateProperty";
 import UserProperties from "./properties/pages/UserProperties";
 import MainNavigation from "./shared/components/Navigation/MainNavigation";
-import { userAuth } from "./shared/hooks/auth-hook";
+import { useAuth } from "./shared/hooks/auth-hook";
 import { AuthContext } from "./shared/context/auth-context";
 
 //styling sheet
@@ -31,7 +31,7 @@ import "./App.css";
 
 const App = () => {
   //object destructuring
-  const { token, login, logout, userId } = userAuth();
+  const { token, login, logout, userId } = useAuth();
 
   //instantiating local variable with the scope of the method
   let routes;

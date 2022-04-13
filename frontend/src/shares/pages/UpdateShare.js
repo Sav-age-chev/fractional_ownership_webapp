@@ -137,7 +137,7 @@ const UpdateShare = () => {
         "PATCH",
         JSON.stringify({
           //share: formState.inputs.share.value,
-          owner: auth.userId,
+          //owner: auth.userId,
           sellPrice: formState.inputs.sellPrice.value,
           forSale: forSaleCheckbox,
         }),

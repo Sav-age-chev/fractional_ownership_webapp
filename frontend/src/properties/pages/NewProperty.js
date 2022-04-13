@@ -80,7 +80,7 @@ const NewProperty = () => {
       formData.append("description", formState.inputs.description.value);
       formData.append("address", formState.inputs.address.value);
       formData.append("price", formState.inputs.price.value);
-      formData.append("creator", auth.userId);
+      //formData.append("creator", auth.userId);
       formData.append("image", formState.inputs.image.value);
 
       console.log("hello1"); // <------ diagnostic -------- DELETE ME ! -----------

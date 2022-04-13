@@ -46,6 +46,7 @@ const UserPropertyItem = (props) => {
   //delete property warning
   const showDeleteWarningHandler = () => {
     setShowConfirmModal(true);
+    console.log("Available shares: " + props.availableShares + " " + checkFullOwnership()); //<--------- diagnostic ------------ DELETE ME ! ---------------------
   };
 
   //cancel property deletion

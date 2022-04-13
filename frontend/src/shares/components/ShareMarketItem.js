@@ -54,7 +54,7 @@ const ShareMarketItem = (props) => {
         `http://localhost:5000/api/shares/sell/${props.id}`,
         "PATCH",
         JSON.stringify({
-          owner: auth.userId,
+          //owner: auth.userId,
           sellPrice: props.sellPrice,
         }),
         {

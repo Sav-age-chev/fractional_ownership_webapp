@@ -208,7 +208,7 @@ const ShareMarket = () => {
         `http://localhost:5000/api/shares/buy/${propertyId}`,
         "POST",
         JSON.stringify({
-          owner: auth.userId,
+          //owner: auth.userId,
           shareProperty: propertyId,
           propertyTitle: loadedProperty.title,
           cost: "35300",
