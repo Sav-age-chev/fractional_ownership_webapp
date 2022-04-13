@@ -1,4 +1,10 @@
-import React, { useState, useCallback } from "react";
+/*
+ * [App.js] file is the root component and in a sense is the backbone of the app.
+ * All the requests are redirected from here to the right file/component
+ */
+
+//import libraries
+import React, { useState, useCallback, useEffect } from "react";
 import {
   BrowserRouter as Router,
   Route,
@@ -6,81 +12,118 @@ import {
   Switch,
 } from "react-router-dom";
 
+//local imports
 import Auth from "./user/pages/Auth";
 import Users from "./user/pages/Users";
+import Shares from "./shares/pages/Shares";
+import ShareMarket from "./shares/pages/ShareMarket";
+import UpdateShare from "./shares/pages/UpdateShare";
 import NewProperty from "./properties/pages/NewProperty";
+import AllProperties from "./properties/pages/AllProperties";
 import UpdateProperty from "./properties/pages/UpdateProperty";
 import UserProperties from "./properties/pages/UserProperties";
 import MainNavigation from "./shared/components/Navigation/MainNavigation";
+import { useAuth } from "./shared/hooks/auth-hook";
 import { AuthContext } from "./shared/context/auth-context";
 
+//styling sheet
 import "./App.css";
 
-/*z
- * [App] is the root component, on the top of the rest of the components.
- *  Here all the part are put together and the routing is done.
- */
-
 const App = () => {
-  const [isLoggedIn, setIsLoggedIn] = useState(false);
+  //object destructuring
+  const { token, login, logout, userId } = useAuth();
 
-  const login = useCallback(() => {
-    setIsLoggedIn(true);
-  }, []);
-
-  const logout = useCallback(() => {
-    setIsLoggedIn(false);
-  }, []);
-
+  //instantiating local variable with the scope of the method
   let routes;
 
-  if (isLoggedIn) {
+  if (token) {
     routes = (
       <Switch>
-        <Route path="/" exact>   {/* Create exact routing. "/" is a filter */}
+        {/* Create exact routing. "/" is a filter */}
+        <Route path="/" exact>
+          <AllProperties />
+        </Route>
+        {/* Create exact routing. "/" is a filter */}
+        <Route path="/users" exact>
           <Users />
         </Route>
-        <Route path="/:userId/properties" exact>   {/* Create exact routing. "/" is a filter */}
+        {/* Create exact routing. "/:userId/shares" is a filter */}
+        <Route path="/:userId/shares" exact>
+          <Shares />
+        </Route>
+        {/* Create exact routing. "/:userId/properties" is a filter */}
+        <Route path="/:userId/properties" exact>
           <UserProperties />
         </Route>
-        <Route path="/properties/new" exact>   {/* Create exact routing. "/" is a filter */}
+        {/* Create exact routing. "/user/:userId/shareId" is a filter
+        <Route path="/shares/:propertyId" exact>
+          <AllProperties />
+        </Route> */}
+        {/* Create exact routing. "/properties/new" is a filter */}
+        <Route path="/properties/new" exact>
           <NewProperty />
         </Route>
-        <Route path="/properties/:propertyId">   {/* /properties/:propertyId should be after /properties/new, else  */}
-          <UpdateProperty />   {/* will be interpreted as the first route. Create exact routing. "/" is a filter */}
+        {/* Create exact routing. "/properties/new" is a filter */}
+        <Route path="/properties/list" exact>
+          <AllProperties />
         </Route>
-        <Redirect to="/" />   {/* If the path after the / is invalid user will be redirected back */}
+        {/* /properties/:propertyId should be after /properties/new, else  */}
+        {/* will be interpreted as the first route. Create exact routing. "/" is a filter */}
+        <Route path="/properties/:propertyId">
+          <UpdateProperty />
+        </Route>
+        {/* Create exact routing. "/shares/property/:shareId" is a filter */}
+        <Route path="/shares/property/:propertyId">
+          <ShareMarket />
+        </Route>
+        {/* Create exact routing. "/shares/:shareId" is a filter */}
+        <Route path="/shares/:shareId">
+          <UpdateShare />
+        </Route>
+        {/* If the path after the / is invalid user will be redirected back */}
+        <Redirect to="/" />
       </Switch>
     );
   } else {
     routes = (
       <Switch>
-        <Route path="/" exact>   {/* Create exact routing. "/" is a filter */}
-          <Users />
+        {/* Create exact routing. "/" is a filter */}
+        <Route path="/" exact>
+          <AllProperties />
         </Route>
-        <Route path="/:userId/properties" exact>   {/* Create exact routing. "/" is a filter */}
-          <UserProperties />
+        {/* Create exact routing. "/properties/new" is a filter */}
+        <Route path="/properties/list" exact>
+          <AllProperties />
         </Route>
+        {/* Create routing. "/auth" is a filter */}
         <Route path="/auth">
           <Auth />
         </Route>
-        <Redirect to="/auth" />   {/* If the path after the / is invalid user will be redirected back */}
+        {/* If the path after the / is invalid user will be redirected back */}
+        <Redirect to="/auth" />
       </Switch>
     );
   }
 
   return (
     <AuthContext.Provider
-      value={{ isLoggedIn: isLoggedIn, login: login, logout: logout }}
-    >                              {/* Context component have to be around all the components that will use it */}
+      value={{
+        isLoggedIn: !!token,
+        token: token,
+        userId: userId,
+        login: login,
+        logout: logout,
+      }}
+    >
+      {" "}
+      {/* Context component have to be around all the components that will use it */}
       <Router>
         <MainNavigation />
-        <main>
-          {routes}
-        </main>
+        <main>{routes}</main>
       </Router>
     </AuthContext.Provider>
   );
 };
 
+//export component
 export default App;
