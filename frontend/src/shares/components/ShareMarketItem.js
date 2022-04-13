@@ -59,6 +59,7 @@ const ShareMarketItem = (props) => {
         }),
         {
           "Content-Type": "application/json",
+          Authorization: "Bearer " + auth.token,
         }
       );
       props.history.push("/properties/list");
@@ -75,8 +76,8 @@ const ShareMarketItem = (props) => {
         footerClass="share-market-item__modal-actions"
         footer={
           <React.Fragment>
-            <Button inverse onClick={cancelBuyHandler}>›
-              CANCEL
+            <Button inverse onClick={cancelBuyHandler}>
+              › CANCEL
             </Button>
             <Button danger onClick={confirmBuyHandler}>
               BUY

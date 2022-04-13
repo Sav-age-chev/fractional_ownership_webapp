@@ -143,6 +143,7 @@ const UpdateShare = () => {
         }),
         {
           "Content-Type": "application/json",
+          Authorization: "Bearer " + auth.token,
         }
       );
       history.push("/" + auth.userId + "/shares");
@@ -211,7 +212,7 @@ const UpdateShare = () => {
   return (
     <React.Fragment>
       <ErrorModal error={error} onClear={clearError} />
-      
+
       {!isLoading && loadedProperty && (
         <div className="property-list">
           <PropertyItem

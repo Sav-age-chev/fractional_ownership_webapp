@@ -101,9 +101,10 @@ const UpdateProperty = () => {
         }),
         {
           "Content-Type": "application/json",
+          Authorization: "Bearer " + auth.token,
         }
       );
-      history.push('/' + auth.userId + '/properties');
+      history.push("/" + auth.userId + "/properties");
     } catch (err) {}
   };
 

@@ -36,10 +36,10 @@ const UserPropertyItem = (props) => {
 
   //check if property can be deleted
   const checkFullOwnership = () => {
-    if (props.availableShares > 100) {
-      return false;
-    } else {
+    if (props.availableShares < 100) {
       return true;
+    } else {
+      return false;
     }
   };
 
@@ -60,7 +60,9 @@ const UserPropertyItem = (props) => {
       //send http request via [http-hook] to the backend to delete the property
       await sendRequest(
         `http://localhost:5000/api/properties/${props.id}`,
-        "DELETE"
+        "DELETE",
+        null,
+        { Authorization: 'Bearer ' + auth.token }
       );
       console.log("PropertyItem: " + props.id); //<--------- diagnostic ------------ DELETE ME ! ---------------------
       props.onDelete(props.id);

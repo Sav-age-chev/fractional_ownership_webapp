@@ -104,7 +104,7 @@ const Auth = () => {
         );
 
         //login user
-        auth.login(responseData.user.id);
+        auth.login(responseData.userId, responseData.token);
       } catch (err) {}
     } else {
       //SIGNUP
@@ -128,7 +128,7 @@ const Auth = () => {
         );
 
         //login user
-        auth.login(responseData.user.id);
+        auth.login(responseData.userId, responseData.token);
       } catch (err) {}
     }
   };

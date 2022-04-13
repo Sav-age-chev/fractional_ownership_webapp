@@ -4,7 +4,7 @@
  */
 
 //import libraries
-import React, { useState, useCallback } from "react";
+import React, { useState, useCallback, useEffect } from "react";
 import {
   BrowserRouter as Router,
   Route,
@@ -23,31 +23,20 @@ import AllProperties from "./properties/pages/AllProperties";
 import UpdateProperty from "./properties/pages/UpdateProperty";
 import UserProperties from "./properties/pages/UserProperties";
 import MainNavigation from "./shared/components/Navigation/MainNavigation";
+import { userAuth } from "./shared/hooks/auth-hook";
 import { AuthContext } from "./shared/context/auth-context";
 
 //styling sheet
 import "./App.css";
 
 const App = () => {
-  //instantiating states
-  const [isLoggedIn, setIsLoggedIn] = useState(false);
-  const [userId, setUserId] = useState(false);
+  //object destructuring
+  const { token, login, logout, userId } = userAuth();
 
-  //manage states
-  const login = useCallback((uid) => {
-    setIsLoggedIn(true);
-    setUserId(uid);
-  }, []);
-
-  //manage states
-  const logout = useCallback(() => {
-    setIsLoggedIn(false);
-    setUserId(null);
-  }, []);
-
+  //instantiating local variable with the scope of the method
   let routes;
 
-  if (isLoggedIn) {
+  if (token) {
     routes = (
       <Switch>
         {/* Create exact routing. "/" is a filter */}
@@ -119,7 +108,8 @@ const App = () => {
   return (
     <AuthContext.Provider
       value={{
-        isLoggedIn: isLoggedIn,
+        isLoggedIn: !!token,
+        token: token,
         userId: userId,
         login: login,
         logout: logout,

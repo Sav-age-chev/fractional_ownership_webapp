@@ -221,8 +221,17 @@ const buyPropertyShare = async (req, res, next) => {
     return next(error);
   }
 
-  //diagnostic
-  console.log(createdShare); // <----------------------- DELETE ME ! -------------------------------------------
+  console.log("Update share owner" + user.id.toString() + " = " + req.userData.userId);   // <-------- diagnostic -------- DELETE ME ! ----------------------------------------------------------
+
+  //checking if the creator user has sent the request
+  if(user.id.toString() !== req.userData.userId) {
+    const error = new HttpError(
+      "User not authorised to purchase this share.",
+      401
+    );
+    return next(error);
+  }
+
 
   try {
     //starting session
@@ -372,6 +381,17 @@ const updateShare = async (req, res, next) => {
     return next(error);
   }
 
+  console.log("Update share " + share.owner.toString() + " = " + req.userData.userId);   // <-------- diagnostic -------- DELETE ME ! ----------------------------------------------------------
+
+  //checking if the creator user has sent the request
+  if(share.owner.toString() !== req.userData.userId) {
+    const error = new HttpError(
+      "User not authorised to amend this share.",
+      401
+    );
+    return next(error);
+  }
+
   //get user if the share change ownership
   // if (share.owner != owner) {
   //   //check if the provided user id exists
@@ -487,13 +507,24 @@ const updateSharesOwner = async (req, res, next) => {
     return next(error);
   }
 
-  //-------------------------------------------------------------------------------------------------------------------
-  // //check if new user has been retrieved
-  // if (!user) {
-  //   const error = new HttpError("Could not find user for the provided id", 404);
-  //   return next(error);
-  // }
+  //check if new user has been retrieved
+  if (!user) {
+    const error = new HttpError("Could not find user for the provided id", 404);
+    return next(error);
+  }
 
+  console.log("Update share owner" + user.id.toString() + " = " + req.userData.userId);   // <-------- diagnostic -------- DELETE ME ! ----------------------------------------------------------
+
+  //checking if the creator user has sent the request
+  if(user.id.toString() !== req.userData.userId.toString()) {
+    const error = new HttpError(
+      "User not authorised to purchase this share.",
+      401
+    );
+    return next(error);
+  }
+
+  //-------------------------------------------------------------------------------------------------------------------
   // let oldUser;
   // //retrieving the new user
   // try {

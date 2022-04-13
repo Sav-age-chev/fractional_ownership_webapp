@@ -88,7 +88,8 @@ const NewProperty = () => {
       await sendRequest(
         "http://localhost:5000/api/properties",
         "POST",
-        formData
+        formData,
+        { Authorization: 'Bearer ' + auth.token }
         /* headers: [FormData] automatically set the headers */
       );
       //redirect user to different page

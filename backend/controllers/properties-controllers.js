@@ -528,7 +528,16 @@ const updateProperty = async (req, res, next) => {
     return next(error);
   }
 
-  //
+  //checking if the creator user has sent the request
+  if(property.creator.toString() !== req.userData.userId) {
+    const error = new HttpError(
+      "User not authorised to amend this property.",
+      401
+    );
+    return next(error);
+  }
+
+  //updating object
   property.title = title;
   property.description = description;
 
@@ -571,6 +580,17 @@ const deleteProperty = async (req, res, next) => {
     const error = new HttpError(
       "Could not find property for the provided id",
       404
+    );
+    return next(error);
+  }
+
+  console.log("Delete property: " + property.creator + " = " + req.userData.userId);   // <-------- diagnostic -------- DELETE ME ! ----------------------------------------------------------
+
+  //checking if the creator user has sent the request
+  if(property.creator.id !== req.userData.userId) {
+    const error = new HttpError(
+      "User not authorised to delete this property.",
+      401
     );
     return next(error);
   }
