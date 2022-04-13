@@ -1,9 +1,11 @@
-import { useCallback, useReducer } from "react";
-
 /*
  * [form-hook] custom hook used for the all the forms pro prevent
  * code repetition of the [useReducer] && [useCallback] hooks
  */
+
+//import libraries
+import { useCallback, useReducer } from "react";
+
 
 //Replacing/updating old state with new state
 const formReducer = (state, action) => {
