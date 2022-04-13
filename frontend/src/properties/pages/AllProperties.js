@@ -7,7 +7,7 @@
 import React, { useEffect, useState } from "react";
 
 //local imports
-import PropertyList from "../components/PropertyList";
+import GeneralPropertyList from "../components/GeneralPropertyList";
 import ErrorModal from "../../shared/components/UIElements/ErrorModal";
 import LoadingSpinner from "../../shared/components/UIElements/LoadingSpinner";
 import { useHttpClient } from "../../shared/hooks/http-hook";
@@ -51,7 +51,7 @@ const AllProperties = () => {
         </div>
       )}
       {!isLoading && loadedProperties && (
-        <PropertyList
+        <GeneralPropertyList
           items={loadedProperties}
           onDeleteProperty={propertyDeletedHandler}
         />

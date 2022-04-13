@@ -1,5 +1,5 @@
 /*
- * [PropertyItem] component is used to store and display property information
+ * [MarketPropertyItem] component is used to store and display property information
  */
 
 //import libraries
@@ -19,7 +19,7 @@ import { useHttpClient } from "../../shared/hooks/http-hook";
 import "./PropertyItem.css";
 
 //function
-const PropertyItem = (props) => {
+const MarketPropertyItem = (props) => {
   //set up listener to the context
   const auth = useContext(AuthContext);
 
@@ -33,6 +33,28 @@ const PropertyItem = (props) => {
   const openMapHandler = () => setShowMap(true);
 
   const closeMapHandler = () => setShowMap(false);
+
+  //delete property methods
+  const showSellWarningHandler = () => {
+    setShowConfirmModal(true);
+  };
+
+  const cancelDeleteHandler = () => {
+    setShowConfirmModal(false);
+  };
+
+  const confirmDeleteHandler = async () => {
+    setShowConfirmModal(false);
+    try {
+      //send http request via [http-hook] to the backend to delete the property
+      await sendRequest(
+        `http://localhost:5000/api/properties/${props.id}`,
+        "DELETE"
+      );
+      console.log("PropertyItem: " + props.id); //<--------- diagnostic ------------ DELETE ME ! ---------------------
+      props.onDelete(props.id);
+    } catch (err) {}
+  };
 
   return (
     <React.Fragment>
@@ -49,26 +71,48 @@ const PropertyItem = (props) => {
           <Map center={props.coordinates} zoom={16} />
         </div>
       </Modal>
+      <Modal
+        show={showConfirmModal}
+        onCancel={cancelDeleteHandler}
+        header="Confirmation"
+        footerClass="property-item__modal-actions"
+        footer={
+          <React.Fragment>
+            <Button inverse onClick={cancelDeleteHandler}>
+              CANCEL
+            </Button>
+            <Button danger onClick={confirmDeleteHandler}>
+              DELETE
+            </Button>
+          </React.Fragment>
+        }
+      >
+        <p>Do you want to proceed and delete this property?</p>
+      </Modal>
       <li className="property-item">
         <Card className="property-item__content">
           {isLoading && <LoadingSpinner asOverlay />}
           <div className="property-item__image">
-            <img
-              src={`http://localhost:5000/${props.image}`}
-              alt={props.title}
-            />
+            <img src={`http://localhost:5000/${props.image}`} alt={props.title} />
           </div>
           <div className="property-item__info">
             <h2>{props.title}</h2>
             <h3>{props.address}</h3>
             <p>{props.description}</p>
-            <h4>Price: {props.price}</h4>
-            <h4>For Sale: {props.availableShares}%</h4>
+            <h4>PRICE: {props.price}</h4>
           </div>
           <div className="property-item__actions">
             <Button inverse onClick={openMapHandler}>
               VIEW ON MAP
             </Button>
+            {auth.userId === props.creatorId && (
+              <Button to={`/properties/${props.id}`}>EDIT</Button>
+            )}
+            {auth.userId === props.creatorId && (
+              <Button danger onClick={showSellWarningHandler}>
+                DELETE
+              </Button>
+            )}
           </div>
         </Card>
       </li>
@@ -77,10 +121,11 @@ const PropertyItem = (props) => {
 };
 
 //export function
-export default PropertyItem;
+export default MarketPropertyItem;
+
 
 // /*
-//  * [PropertyItem] component is used to store and display users information
+//  * [MarketPropertyItem] component is used to store and display property information
 //  */
 
 // //import libraries
@@ -97,10 +142,10 @@ export default PropertyItem;
 // import { useHttpClient } from "../../shared/hooks/http-hook";
 
 // //style sheet
-// import "./PropertyItem.css";
+// import "./MarketPropertyItem.css";
 
 // //function
-// const PropertyItem = (props) => {
+// const MarketPropertyItem = (props) => {
 //   //set up listener to the context
 //   const auth = useContext(AuthContext);
 
@@ -114,28 +159,6 @@ export default PropertyItem;
 //   const openMapHandler = () => setShowMap(true);
 
 //   const closeMapHandler = () => setShowMap(false);
-
-//   //delete property methods
-//   const showDeleteWarningHandler = () => {
-//     setShowConfirmModal(true);
-//   };
-
-//   const cancelDeleteHandler = () => {
-//     setShowConfirmModal(false);
-//   };
-
-//   const confirmDeleteHandler = async () => {
-//     setShowConfirmModal(false);
-//     try {
-//       //send http request via [http-hook] to the backend to delete the property
-//       await sendRequest(
-//         `http://localhost:5000/api/properties/${props.id}`,
-//         "DELETE"
-//       );
-//       console.log("PropertyItem: " + props.id); //<--------- diagnostic ------------ DELETE ME ! ---------------------
-//       props.onDelete(props.id);
-//     } catch (err) {}
-//   };
 
 //   return (
 //     <React.Fragment>
@@ -154,21 +177,21 @@ export default PropertyItem;
 //       </Modal>
 //       <Modal
 //         show={showConfirmModal}
-//         onCancel={cancelDeleteHandler}
+//         onCancel={cancelSellHandler}
 //         header="Confirmation"
 //         footerClass="property-item__modal-actions"
 //         footer={
 //           <React.Fragment>
-//             <Button inverse onClick={cancelDeleteHandler}>
+//             <Button inverse onClick={cancelSellHandler}>
 //               CANCEL
 //             </Button>
-//             <Button danger onClick={confirmDeleteHandler}>
-//               DELETE
+//             <Button danger onClick={confirmSellHandler}>
+//               SELL
 //             </Button>
 //           </React.Fragment>
 //         }
 //       >
-//         <p>Do you want to proceed and delete this property?</p>
+//         <p>Do you want to proceed and sell your share of the property?</p>
 //       </Modal>
 //       <li className="property-item">
 //         <Card className="property-item__content">
@@ -180,20 +203,13 @@ export default PropertyItem;
 //             <h2>{props.title}</h2>
 //             <h3>{props.address}</h3>
 //             <p>{props.description}</p>
-//             <h4>{props.price}</h4>
+//             <h4>Price: {props.price}</h4>
+//             <h4>For Sale: {props.availableShares}%</h4>
 //           </div>
 //           <div className="property-item__actions">
 //             <Button inverse onClick={openMapHandler}>
 //               VIEW ON MAP
 //             </Button>
-//             {auth.userId === props.creatorId && (
-//               <Button to={`/properties/${props.id}`}>EDIT</Button>
-//             )}
-//             {auth.userId === props.creatorId && (
-//               <Button danger onClick={showDeleteWarningHandler}>
-//                 DELETE
-//               </Button>
-//             )}
 //           </div>
 //         </Card>
 //       </li>
@@ -202,4 +218,4 @@ export default PropertyItem;
 // };
 
 // //export function
-// export default PropertyItem;
+// export default MarketPropertyItem;

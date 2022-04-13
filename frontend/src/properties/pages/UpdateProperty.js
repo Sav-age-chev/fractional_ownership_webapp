@@ -88,7 +88,7 @@ const UpdateProperty = () => {
   }, [sendRequest, propertyId, setFormData]);
 
   //asynchronous function for submit event
-  const placeUpdateSubmitHandler = async (event) => {
+  const propertyUpdateSubmitHandler = async (event) => {
     event.preventDefault();
     try {
       //sending http request via the [http-hook]. [sendRequest] is a pointer and take arguments for url, method, body && headers
@@ -132,7 +132,7 @@ const UpdateProperty = () => {
     <React.Fragment>
       <ErrorModal error={error} onClear={clearError} />
       {!isLoading && loadedProperty && (
-        <form className="property-form" onSubmit={placeUpdateSubmitHandler}>
+        <form className="property-form" onSubmit={propertyUpdateSubmitHandler}>
           <Input
             id="title"
             element="input"

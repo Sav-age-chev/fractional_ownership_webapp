@@ -19,6 +19,8 @@ const shareSchema = new Schema({
   propertyTitle: { type: String, required: true },
   cost: { type: Number, required: true },
   share: { type: Number, required: true },
+  sellPrice: { type: Number, required: true },
+  forSale: { type: Boolean, default: false },
 });
 
 //export model

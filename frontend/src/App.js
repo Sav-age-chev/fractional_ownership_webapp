@@ -16,6 +16,8 @@ import {
 import Auth from "./user/pages/Auth";
 import Users from "./user/pages/Users";
 import Shares from "./shares/pages/Shares";
+import ShareMarket from "./shares/pages/ShareMarket";
+import UpdateShare from "./shares/pages/UpdateShare";
 import NewProperty from "./properties/pages/NewProperty";
 import AllProperties from "./properties/pages/AllProperties";
 import UpdateProperty from "./properties/pages/UpdateProperty";
@@ -50,20 +52,24 @@ const App = () => {
       <Switch>
         {/* Create exact routing. "/" is a filter */}
         <Route path="/" exact>
+          <AllProperties />
+        </Route>
+        {/* Create exact routing. "/" is a filter */}
+        <Route path="/users" exact>
           <Users />
         </Route>
-        {/* Create exact routing. "/user/:userId" is a filter */}
-        <Route path="/shares/user/:userId" exact>
+        {/* Create exact routing. "/:userId/shares" is a filter */}
+        <Route path="/:userId/shares" exact>
           <Shares />
         </Route>
         {/* Create exact routing. "/:userId/properties" is a filter */}
         <Route path="/:userId/properties" exact>
           <UserProperties />
         </Route>
-        {/* Create exact routing. "/user/:userId/shareId" is a filter */}
-        <Route path="/shares/:shareId" exact>
+        {/* Create exact routing. "/user/:userId/shareId" is a filter
+        <Route path="/shares/:propertyId" exact>
           <AllProperties />
-        </Route>
+        </Route> */}
         {/* Create exact routing. "/properties/new" is a filter */}
         <Route path="/properties/new" exact>
           <NewProperty />
@@ -77,6 +83,14 @@ const App = () => {
         <Route path="/properties/:propertyId">
           <UpdateProperty />
         </Route>
+        {/* Create exact routing. "/shares/property/:shareId" is a filter */}
+        <Route path="/shares/property/:propertyId">
+          <ShareMarket />
+        </Route>
+        {/* Create exact routing. "/shares/:shareId" is a filter */}
+        <Route path="/shares/:shareId">
+          <UpdateShare />
+        </Route>
         {/* If the path after the / is invalid user will be redirected back */}
         <Redirect to="/" />
       </Switch>
@@ -86,15 +100,11 @@ const App = () => {
       <Switch>
         {/* Create exact routing. "/" is a filter */}
         <Route path="/" exact>
-          <Users />
+          <AllProperties />
         </Route>
         {/* Create exact routing. "/properties/new" is a filter */}
         <Route path="/properties/list" exact>
           <AllProperties />
-        </Route>
-        {/* Create exact routing. "/" is a filter */}
-        <Route path="/:userId/properties" exact>
-          <UserProperties />
         </Route>
         {/* Create routing. "/auth" is a filter */}
         <Route path="/auth">

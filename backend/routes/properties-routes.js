@@ -19,6 +19,9 @@ router.get("/list", propertiesControllers.getAllProperties);
 //get property by property id. Uses pointer to a function and not executing it ()
 router.get("/:pid", propertiesControllers.getPropertyById);
 
+//get property by share id. Uses pointer to a function and not executing it ()
+router.get("/share/:sid", propertiesControllers.getPropertyByShareId);
+
 //get property by user id. Uses pointer to a function and not executing it ()
 router.get("/user/:uid", propertiesControllers.getPropertiesByUserId);
 

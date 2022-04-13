@@ -81,8 +81,63 @@ const getSharesByUserId = async (req, res, next) => {
   });
 };
 
+//Get share by property id
+const getSharesByPropertyId = async (req, res, next) => {
+  //get the property id from the url
+  const propertyId = req.params.pid;
+
+  //instantiating new variable with a scope of the method
+  let propertyWithShares;
+
+  //get the given property shares by using pointers from the [propertyShares] field. Returns error if fail
+  try {
+    // propertyWithShares = await Property.findById(propertyId).populate(
+    //   "propertyShares"
+    // );
+    propertyWithShares = await Property.findById(propertyId).populate({
+      path: "propertyShares",
+      match: { forSale: true },
+    });
+  } catch (err) {
+    const error = new HttpError(
+      "Fetching shares failed, please try again later.",
+      500
+    );
+    return next(error);
+  }
+
+  console.log("The answer you seek: " + propertyWithShares); // <------- diagnostic --------- PLEASE DELETE ME ! ----------
+
+  //returns error in case no share was found
+  // if (!propertyWithShares || propertyWithShares.propertyShares.length === 0) {
+  //   return next(
+  //     new HttpError("Could not find shares for the provided property id.", 404)
+  //   );
+  // }
+
+  //response to the request. Using [map] as we browse trough an array. Then covert to JavaScript object and activate the getters to get rid of the underscore
+  res.json({
+    shares: propertyWithShares.propertyShares.map((share) =>
+      share.toObject({ getters: true })
+    ),
+  });
+};
+
 //buy property share
 const buyPropertyShare = async (req, res, next) => {
+  const { owner, shareProperty, propertyTitle, cost, share } = req.body;
+  console.log(
+    "Request body: " +
+      owner +
+      " " +
+      shareProperty +
+      " " +
+      propertyTitle +
+      " " +
+      cost +
+      " " +
+      share
+  ); // <---------- diagnostic ---------- PLEASE DELETE ME ! ---------
   //check validation results and return error in case is not empty
   const errors = validationResult(req);
   if (!errors.isEmpty()) {
@@ -92,26 +147,26 @@ const buyPropertyShare = async (req, res, next) => {
   }
 
   //get data from the body
-  const { owner, shareProperty, propertyTitle, cost, share } = req.body;
+  //const { owner, shareProperty, propertyTitle, cost, share } = req.body;
   //get id from the url
   const propertyId = req.params.pid;
 
   //instantiating new variable with a scope of the method
   let property;
 
-  console.log(propertyId); // <---------- diagnostic ---------- PLEASE DELETE ME ! ---------
+  console.log("Now! " + propertyId); // <---------- diagnostic ---------- PLEASE DELETE ME ! ---------
 
   //instantiating new object using the blueprint from models
   const createdShare = new Share({
     owner, //owner == owner: owner
     shareProperty,
     propertyTitle,
-    //propertyTitle: property.title,
+    sellPrice: cost,
     cost,
     share,
   });
 
-  console.log(createdShare); // <---------- diagnostic ---------- PLEASE DELETE ME ! ---------
+  console.log("New Share " + createdShare); // <---------- diagnostic ---------- PLEASE DELETE ME ! ---------
 
   //try to get property by id from database with an asynchronous method. Catch and displays error if it fail
   try {
@@ -263,57 +318,260 @@ const sellPropertyShare = async (req, res, next) => {
   res.status(200).json({ message: "Share sold." });
 };
 
-// //update existing property
-// const updateProperty = async (req, res, next) => {
-//   //check validation results and return error in case is not empty
-//   const errors = validationResult(req);
-//   if (!errors.isEmpty()) {
-//     return next(
-//       new HttpError("Invalid inputs passed, please check your data.", 422)
-//     );
-//   }
+//update existing share
+const updateShare = async (req, res, next) => {
+  //console.log(req); // <----------------------- DELETE ME ! ----------------------------------------------------------
+  //check validation results and return error in case is not empty
+  const errors = validationResult(req);
+  //console.log(errors); // <----------------------- DELETE ME ! ----------------------------------------------------------
+  if (!errors.isEmpty()) {
+    return next(
+      new HttpError("Invalid inputs passed, please check your data.", 422)
+    );
+  }
 
-//   //get data from the body
-//   const { title, description } = req.body;
-//   //get id from the url
-//   const propertyId = req.params.pid;
+  //get data from the body
+  const { owner, sellPrice, forSale } = req.body;
+  //get id from the url
+  const shareId = req.params.sid;
 
-//   //instantiating new variable with a scope of the method
-//   let property;
+  console.log(
+    "Passed data to shareUpdate: " + owner + " " + forSale + " " + shareId
+  ); // <----------------------- DELETE ME ! --------------------------
 
-//   //try to get property by id from database with an asynchronous method. Catch and displays error if it fail
-//   try {
-//     property = await Property.findById(propertyId);
-//   } catch (err) {
-//     const error = new HttpError(
-//       "Something went wrong, could not update property.",
-//       500
-//     );
-//     return next(error);
-//   }
+  //instantiating new variable with a scope of the method
+  let share;
 
-//   //updating details
-//   property.title = title;
-//   property.description = description;
+  //try to get share by user and property id from database with an asynchronous method. Catch and displays error if it fail
+  // try {
+  //   share = await Share.find({owner: userId, shareProperty: propertyId });
+  // } catch (err) {
+  //   const error = new HttpError(
+  //     "Something went wrong, could not update share.",
+  //     500
+  //   );
+  //   return next(error);
+  // }
 
-//   //try to save the newly updated property into the database with asynchronous method. Catch and displays error if it fails
-//   try {
-//     await property.save();
-//   } catch (err) {
-//     const error = new HttpError(
-//       "Something went wrong, could not update property",
-//       500
-//     );
-//     return next(error);
-//   }
+  try {
+    share = await Share.findById(shareId);
+  } catch (err) {
+    const error = new HttpError(
+      "Something went wrong, could not update your share of the property.",
+      500
+    );
+    return next(error);
+  }
 
-//   //response to the request. Covert [property] to JavaScript object. {getters: true} removes the underscore from the id
-//   res.status(200).json({ property: property.toObject({ getters: true }) });
-// };
+  //check if share exist
+  if (!share) {
+    const error = new HttpError(
+      "Could not find share for the provided id",
+      404
+    );
+    return next(error);
+  }
+
+  //get user if the share change ownership
+  // if (share.owner != owner) {
+  //   //check if the provided user id exists
+  //   let user;
+  //   try {
+  //     user = await User.findById(owner);
+  //   } catch (err) {
+  //     const error = new HttpError(
+  //       "Something went wrong, could not retrieve the user data.",
+  //       500
+  //     );
+  //     return next(error);
+  //   }
+
+  //   //check if user has been retrieved
+  //   if (!user) {
+  //     const error = new HttpError(
+  //       "Could not find user for the provided id",
+  //       404
+  //     );
+  //     return next(error);
+  //   }
+  // }
+
+  //updating details
+  share.owner = owner;
+  if (forSale) {
+    share.forSale = !share.forSale;
+    share.sellPrice = sellPrice;
+  }
+
+  //try to save the newly updated share into the database with asynchronous method. Catch and displays error if it fails
+  try {
+    await share.save();
+  } catch (err) {
+    const error = new HttpError(
+      "Something went wrong, could not update share",
+      500
+    );
+    return next(error);
+  }
+
+  //response to the request. Convert [share] to JavaScript object. {getters: true} removes the underscore from the id
+  res.status(200).json({ share: share.toObject({ getters: true }) });
+};
+
+//update existing share
+const updateSharesOwner = async (req, res, next) => {
+  //console.log(req); // <----------------------- DELETE ME ! ----------------------------------------------------------
+  //check validation results and return error in case is not empty
+  const errors = validationResult(req);
+  //console.log(errors); // <----------------------- DELETE ME ! ----------------------------------------------------------
+  if (!errors.isEmpty()) {
+    return next(
+      new HttpError("Invalid inputs passed, please check your data.", 422)
+    );
+  }
+
+  //get data from the body
+  const { owner, sellPrice } = req.body;
+  //get id from the url
+  const shareId = req.params.sid;
+
+  console.log(
+    "Passed data to shareUpdate: " + owner + " - " + sellPrice + " - " + shareId
+  ); // <----------------------- DELETE ME ! --------------------------
+
+  //instantiating new variable with a scope of the method
+  let share;
+
+  try {
+    share = await Share.findById(shareId).populate("owner");
+  } catch (err) {
+    const error = new HttpError(
+      "Something went wrong, could not update your share of the property.",
+      500
+    );
+    return next(error);
+  }
+
+  //-------------------------------------------------------------------------------------------------------------------
+  // try {
+  //   share = await Share.findById(shareId);
+  // } catch (err) {
+  //   const error = new HttpError(
+  //     "Something went wrong, could not update your share of the property.",
+  //     500
+  //   );
+  //   return next(error);
+  // }
+  //-------------------------------------------------------------------------------------------------------------------
+
+  //check if share exist
+  if (!share) {
+    const error = new HttpError(
+      "Could not find share for the provided id",
+      404
+    );
+    return next(error);
+  }
+
+  //instantiating new variable with a scope of the method
+  let user;
+
+  //retrieving the new user
+  try {
+    user = await User.findById(owner);
+  } catch (err) {
+    const error = new HttpError(
+      "Something went wrong, could not retrieve the user data.",
+      500
+    );
+    return next(error);
+  }
+
+  //-------------------------------------------------------------------------------------------------------------------
+  // //check if new user has been retrieved
+  // if (!user) {
+  //   const error = new HttpError("Could not find user for the provided id", 404);
+  //   return next(error);
+  // }
+
+  // let oldUser;
+  // //retrieving the new user
+  // try {
+  //   oldUser = await User.findById(share.owner);
+  // } catch (err) {
+  //   const error = new HttpError(
+  //     "Something went wrong, could not retrieve the old user data.",
+  //     500
+  //   );
+  //   return next(error);
+  // }
+
+  // //check if new oldUser has been retrieved
+  // if (!oldUser) {
+  //   const error = new HttpError("Could not find old user for the provided id", 404);
+  //   return next(error);
+  // }
+  //-------------------------------------------------------------------------------------------------------------------
+
+  //updating details
+  share.forSale = !share.forSale;
+  share.cost = sellPrice;
+
+  //try to save the newly updated share into the database with asynchronous method. Catch and displays error if it fails
+  try {
+    //-------------------------------------------------------------------------------------------------------------------
+    // //starting new session
+    // const sess = await mongoose.startSession();
+    // //starting a transaction
+    // sess.startTransaction();
+    // //update the owner field in share
+    // share.owner = user;
+    // //save share
+    // await share.save();
+    // //remove share from the old user array
+    // oldUser.userShares.pull(share);
+    // //saves the update
+    // await oldUser.save({ session: sess });
+    // //add share to the new user array
+    // user.userShares.push(share);
+    // //saves the update
+    // await user.save();
+    // //update the owner field in share
+    //-------------------------------------------------------------------------------------------------------------------
+    //starting new session
+    const sess = await mongoose.startSession();
+    //starting a transaction
+    sess.startTransaction();
+    //execute the following if share change ownership
+    console.log("Hello from condition two!"); // <--- DELETE ME ! ---
+    //remove share from the old user array
+    share.owner.userShares.pull(share);
+    //saves the update
+    await share.owner.save({ session: sess });
+    //add share to the new user array
+    user.userShares.push(share);
+    //saves the update
+    await user.save();
+    //update the owner field in share
+    share.owner = user;
+    //save share
+    await share.save();
+    //commit the transaction
+    await sess.commitTransaction();
+  } catch (err) {
+    const error = new HttpError(
+      "Something went wrong, could not update share",
+      500
+    );
+    return next(error);
+  }
+};
 
 //exporting functions pointers rather than executables
 exports.getShareById = getShareById;
 exports.getSharesByUserId = getSharesByUserId;
-// exports.updateProperty = updateProperty;
+exports.getSharesByPropertyId = getSharesByPropertyId;
+exports.updateShare = updateShare;
 exports.buyPropertyShare = buyPropertyShare;
 exports.sellPropertyShare = sellPropertyShare;
+exports.updateSharesOwner = updateSharesOwner;

@@ -13,9 +13,7 @@ const HttpError = require("../models/http-error");
 const getCoordsForAddress = require("../util/location");
 const Property = require("../models/property");
 const User = require("../models/user");
-//--------------------FOW-------------------------
-// const Share = require("../models/share");
-//--------------------FOW-------------------------
+const Share = require("../models/share");
 
 //--------------------FOW-------------------------
 //get all properties
@@ -145,6 +143,53 @@ const getPropertiesByUserId = async (req, res, next) => {
       property.toObject({ getters: true })
     ),
   });
+  //    ALTERNATIVE: res.json({
+  //     properties: properties.map((property) =>
+  //     property.toObject({ getters: true })
+  //   ),
+  // });
+};
+
+//Get property by share id
+const getPropertyByShareId = async (req, res, next) => {
+  //get the share id from the url
+  const shareId = req.params.sid;
+
+  //instantiating new variable with a scope of the method
+  let tempShareProperty;
+  // ALTERNATIVE: let properties;
+
+  console.log(shareId); // <----------------------- DELETE ME ! --------------------------
+
+  //get the property by comparing share id from url against database shareProperty field. Returns error if fail
+  try {
+    tempShareProperty = await Share.findById(shareId).populate("shareProperty");
+    // ALTERNATIVE: properties = await Property.find({ creator: userId });
+  } catch (err) {
+    const error = new HttpError(
+      "Fetching property failed, please try again later.",
+      500
+    );
+    return next(error);
+  }
+
+  //returns error in case no property was found
+  if (!tempShareProperty || tempShareProperty.shareProperty.length === 0) {
+    // ALTERNATIVE: if (!properties || properties.length === 0) {
+    return next(
+      new HttpError("Could not find property for the provided share id.", 404)
+    );
+  }
+
+  //response to the request. Covert [property] to JavaScript object. {getters: true} removes the underscore from the id
+  res.json({ property: tempShareProperty.shareProperty.toObject({ getters: true }) });
+
+  //response to the request. Using [map] as we browse trough an array. Then covert to JavaScript object and activate the getters to get rid of the underscore
+  // res.json({
+  //   properties: tempShareProperty.properties.map((property) =>
+  //     property.toObject({ getters: true })
+  //   ),
+  // });
   //    ALTERNATIVE: res.json({
   //     properties: properties.map((property) =>
   //     property.toObject({ getters: true })
@@ -455,6 +500,7 @@ const createProperty = async (req, res, next) => {
 
 //update existing property
 const updateProperty = async (req, res, next) => {
+  
   //check validation results and return error in case is not empty
   const errors = validationResult(req);
   if (!errors.isEmpty()) {
@@ -566,6 +612,7 @@ const deleteProperty = async (req, res, next) => {
 exports.getAllProperties = getAllProperties;
 exports.getPropertyById = getPropertyById;
 exports.getPropertiesByUserId = getPropertiesByUserId;
+exports.getPropertyByShareId = getPropertyByShareId;
 exports.createProperty = createProperty;
 exports.updateProperty = updateProperty;
 exports.deleteProperty = deleteProperty;
