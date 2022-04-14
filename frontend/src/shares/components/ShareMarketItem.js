@@ -99,7 +99,7 @@ const ShareMarketItem = (props) => {
           </div>
           <div className="share-market-item__info">
             <h4>Share of the property: {props.share}%</h4>
-            <h4>Asking price: {props.sellPrice}</h4>
+            <h4>Asking price: £{props.sellPrice}</h4>
           </div>
           <div className="share-market-item__actions">
             <Button

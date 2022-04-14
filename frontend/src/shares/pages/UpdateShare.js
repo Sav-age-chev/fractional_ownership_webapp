@@ -237,9 +237,9 @@ const UpdateShare = () => {
           </div>
           <div>
             <h4>Owned percentile: {loadedShare.share}%</h4>
-            <h4>Initial cost: {parseFloat(loadedShare.cost).toFixed(2)}</h4>
-            <h4>Market value: {calculateCurrentPropertyValue()}</h4>
-            <h4>Profit/Loss: {calculateCurrentProfitLoss()}</h4>
+            <h4>Initial cost: £{parseFloat(loadedShare.cost).toFixed(2)}</h4>
+            <h4>Market value: £{calculateCurrentPropertyValue()}</h4>
+            <h4>Profit/Loss: £{calculateCurrentProfitLoss()}</h4>
             <h4>For sale: {(loadedShare.forSale && "YES") || "NO"}</h4>
           </div>
           <Input

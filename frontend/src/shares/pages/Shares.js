@@ -34,7 +34,7 @@ const Shares = () => {
 
         setLoadedShares(responseData.shares);
 
-        console.log(responseData.shares);     // <----------- diagnostic ------------- PLEASE DELETE ME ! -------------------
+        console.log(responseData.shares); // <----------- diagnostic ------------- PLEASE DELETE ME ! -------------------
       } catch (err) {}
     };
     fetchShares();
@@ -42,13 +42,13 @@ const Shares = () => {
 
   return (
     <React.Fragment>
-      <ErrorModal error={error} onClear={clearError} />
+      {/* <ErrorModal error={error} onClear={clearError} /> */}
       {isLoading && (
         <div className="center">
           <LoadingSpinner />
         </div>
       )}
-      {!isLoading && loadedShares && <SharesList items={loadedShares} />}
+      {!isLoading && <SharesList items={loadedShares} />}
     </React.Fragment>
   );
 };

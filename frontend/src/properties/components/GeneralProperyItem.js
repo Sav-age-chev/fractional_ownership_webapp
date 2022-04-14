@@ -58,7 +58,7 @@ const GeneralPropertyItem = (props) => {
             <h2>{props.title}</h2>
             <h3>{props.address}</h3>
             <p>{props.description}</p>
-            <h4>PRICE: {props.price}</h4>
+            <h4>PRICE: £{props.price}</h4>
           </div>
           <div className="property-item__actions">
             <Button inverse onClick={openMapHandler}>

@@ -27,7 +27,7 @@ const ShareItem = (props) => {
           </div>
           <div className="share-item__info">
             <h2>{props.propertyTitle}</h2>
-            <h3>Cost: {props.cost}</h3>
+            <h3>Cost: £{props.cost}</h3>
             <h3>
               {" "}
               Own: {props.shares} {props.shares === 1 ? "Percent" : "Percents"}

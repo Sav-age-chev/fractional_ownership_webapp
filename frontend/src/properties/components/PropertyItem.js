@@ -62,7 +62,7 @@ const PropertyItem = (props) => {
             <h2>{props.title}</h2>
             <h3>{props.address}</h3>
             <p>{props.description}</p>
-            <h4>Price: {props.price}</h4>
+            <h4>Price: £{props.price}</h4>
             <h4>For Sale: {props.availableShares}%</h4>
           </div>
           <div className="property-item__actions">

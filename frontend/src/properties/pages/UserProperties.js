@@ -55,7 +55,7 @@ const UserProperties = () => {
           <LoadingSpinner />
         </div>
       )}
-      {!isLoading && loadedProperties && (
+      {!isLoading && (
         <UserPropertyList
           items={loadedProperties}
           onDeleteProperty={propertyDeletedHandler}

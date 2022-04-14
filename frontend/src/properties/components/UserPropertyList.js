@@ -11,7 +11,7 @@ import "./PropertyList.css";
  */
 
 const UserPropertyList = (props) => {
-  if (props.items.length === 0) {
+  if (!props.items || props.items.length === 0) {
     return (
       <div className="property-list center">
         <Card>

@@ -7,6 +7,7 @@ import React from "react";
 
 //local imports
 import ShareItem from "./ShareItem";
+import Button from "../../shared/components/FormElements/Button";
 import Card from "../../shared/components/UIElements/Card";
 
 //stylesheet
@@ -14,11 +15,12 @@ import "./SharesList.css";
 
 //function
 const SharesList = (props) => {
-  if (props.items.length === 0) {
+  if (!props.items || props.items.length === 0) {
     return (
-      <div className="center">
+      <div className="shares-list center">
         <Card>
-          <h2>No shares found.</h2>
+          <h2>No shared ownerships were found. Care to purchase some?</h2>
+          <Button to="/properties/list">MARKETPLACE</Button>
         </Card>
       </div>
     );
