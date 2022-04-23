@@ -35,6 +35,7 @@ const UserPropertyList = (props) => {
           price={property.price}
           creatorId={property.creator}
           availableShares={property.availableShares}
+          approved={property.approved}
           coordinates={property.location}
           onDelete={props.onDeleteProperty}
         />

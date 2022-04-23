@@ -10,6 +10,7 @@ import { useParams, useHistory } from "react-router-dom";
 import Card from "../../shared/components/UIElements/Card";
 import Input from "../../shared/components/FormElements/Input";
 import Button from "../../shared/components/FormElements/Button";
+import InfoModal from "../../shared/components/UIElements/InfoModal";
 import ErrorModal from "../../shared/components/UIElements/ErrorModal";
 import LoadingSpinner from "../../shared/components/UIElements/LoadingSpinner";
 import { useForm } from "../../shared/hooks/form-hook";
@@ -30,6 +31,7 @@ const UpdateProperty = () => {
 
   //instantiating state
   const [loadedProperty, setLoadedProperty] = useState();
+  const [showInfo, setShowInfo] = useState(true);
 
   //object destructuring
   const { isLoading, error, sendRequest, clearError } = useHttpClient();
@@ -128,9 +130,15 @@ const UpdateProperty = () => {
     );
   }
 
+  //manage state - setting error stat back to null
+  const clearInfo = () => {
+    setShowInfo(null);
+  };
+
   //returns and display the response from the backend
   return (
     <React.Fragment>
+      <InfoModal info={<p>Hello Plamen</p>} infoState={showInfo} onClear={clearInfo}/> 
       <ErrorModal error={error} onClear={clearError} />
       {!isLoading && loadedProperty && (
         <form className="property-form" onSubmit={propertyUpdateSubmitHandler}>

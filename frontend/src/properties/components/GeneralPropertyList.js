@@ -25,7 +25,7 @@ const GeneralPropertyList = (props) => {
   return (
     <ul className="property-list">
       {props.items.map((property) => (
-        <GeneralPropertyItem
+        property.approved && <GeneralPropertyItem
           key={property.id}
           id={property.id}
           image={property.image}

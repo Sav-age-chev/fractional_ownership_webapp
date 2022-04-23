@@ -305,7 +305,7 @@ const ShareMarket = () => {
           />
           <h4>Cost: {newShareCost}</h4>
           <div className="share-item__actions">
-            <Button type="submit" onClick={showBuyWarningHandler}>
+            <Button type="submit" disabled={!loadedProperty.approved} onClick={showBuyWarningHandler}>
               BUY
             </Button>
           </div>

@@ -36,6 +36,23 @@ const App = () => {
   //instantiating local variable with the scope of the method
   let routes;
 
+  // if (admin) {
+  //   <Switch>
+  //     {/* Create exact routing. "/" is a filter */}
+  //     <Route path="/" exact>
+  //       <AllProperties />
+  //     </Route>
+  //     {/* Create exact routing. "/" is a filter */}
+  //     <Route path="/users" exact>
+  //       <Users />
+  //     </Route>
+  //     {/* Create routing. "/auth" is a filter */}
+  //     <Route path="/auth">
+  //       <Auth />
+  //     </Route>
+  //     {/* If the path after the / is invalid user will be redirected back */}
+  //     <Redirect to="/auth" />
+  //   </Switch>;
   if (token) {
     routes = (
       <Switch>
@@ -89,6 +106,10 @@ const App = () => {
       <Switch>
         {/* Create exact routing. "/" is a filter */}
         <Route path="/" exact>
+          <AllProperties />
+        </Route>
+        {/* Create exact routing. "/properties/new" is a filter */}
+        <Route path="/properties/list" exact>
           <AllProperties />
         </Route>
         {/* Create exact routing. "/properties/new" is a filter */}
