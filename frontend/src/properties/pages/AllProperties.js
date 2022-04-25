@@ -27,7 +27,7 @@ const AllProperties = () => {
       try {
         //sending http request. [sendRequest] is a pointer to the function within the http hook and expects url and for the rest of the arguments will use default
         const responseData = await sendRequest(
-          "http://localhost:5000/api/properties/list"
+          process.env.REACT_APP_BACKEND_URL + "/properties/list"
         );
         setLoadedProperties(responseData.properties);
       } catch (err) {}

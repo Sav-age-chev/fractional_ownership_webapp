@@ -21,7 +21,7 @@ const ShareItem = (props) => {
         <Link to={`/shares/${props.id}`}>
           <div className="share-item__image">
             <Avatar
-              image="http://localhost:5000/uploads/images/share.png"
+              image={process.env.REACT_APP_ASSET_URL + "/uploads/images/share.png"}
               alt={props.propertyTitle}
             />
           </div>

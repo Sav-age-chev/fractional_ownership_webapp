@@ -90,7 +90,7 @@ const Auth = () => {
         //sending http request. [sendRequest] is a pointer to the function within the http hook and expects url, method, body & headers as arguments
         const responseData = await sendRequest(
           /* URL */
-          "http://localhost:5000/api/users/login",
+          process.env.REACT_APP_BACKEND_URL + "/users/login",
           /* METHOD */
           "POST",
           /* body: the data. Converts JavaScript to JSON data */
@@ -119,7 +119,7 @@ const Auth = () => {
         //sending http request. [sendRequest] is a pointer to the function within the http hook and expects url, method, body & headers as arguments
         const responseData = await sendRequest(
           /* URL */
-          "http://localhost:5000/api/users/signup",
+          process.env.REACT_APP_BACKEND_URL + "/users/signup",
           /* METHOD */
           "POST",
           /* body: the data. passing the [FormData] object */

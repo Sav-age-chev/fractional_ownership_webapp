@@ -60,7 +60,7 @@ const UserPropertyItem = (props) => {
     try {
       //send http request via [http-hook] to the backend to delete the property
       await sendRequest(
-        `http://localhost:5000/api/properties/${props.id}`,
+        `${process.env.REACT_APP_BACKEND_URL}/properties/${props.id}`,
         "DELETE",
         null,
         { Authorization: 'Bearer ' + auth.token }
@@ -119,7 +119,7 @@ const UserPropertyItem = (props) => {
           {isLoading && <LoadingSpinner asOverlay />}
           <div className="property-item__image">
             <img
-              src={`http://localhost:5000/${props.image}`}
+              src={`${process.env.REACT_APP_ASSET_URL}/${props.image}`}
               alt={props.title}
             />
           </div>

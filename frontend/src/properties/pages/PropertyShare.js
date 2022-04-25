@@ -62,7 +62,7 @@ const UpdateProperty = () => {
       try {
         //sending http request via the [http-hook]. [sendRequest] is a pointer and take arguments for url, method, body && headers
         const responseData = await sendRequest(
-          `http://localhost:5000/api/properties/${propertyId}`
+          `${process.env.REACT_APP_BACKEND_URL}/properties/${propertyId}`
         );
         //setting up state holding property data
         setLoadedProperty(responseData.property);
@@ -93,7 +93,7 @@ const UpdateProperty = () => {
     try {
       //sending http request via the [http-hook]. [sendRequest] is a pointer and take arguments for url, method, body && headers
       await sendRequest(
-        `http://localhost:5000/api/properties/${propertyId}`,
+        `${process.env.REACT_APP_BACKEND_URL}/properties/${propertyId}`,
         "PATCH",
         JSON.stringify({
           title: formState.inputs.title.value,

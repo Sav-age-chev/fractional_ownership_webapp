@@ -51,7 +51,7 @@ const ShareMarketItem = (props) => {
     try {
       //sending http request via the [http-hook]. [sendRequest] is a pointer and take arguments for url, method, body && headers
       await sendRequest(
-        `http://localhost:5000/api/shares/sell/${props.id}`,
+        `${process.env.REACT_APP_BACKEND_URL}/shares/sell/${props.id}`,
         "PATCH",
         JSON.stringify({
           //owner: auth.userId,
@@ -93,7 +93,7 @@ const ShareMarketItem = (props) => {
           {isLoading && <LoadingSpinner asOverlay />}
           <div className="share-market-item__image">
             <Avatar
-              image="http://localhost:5000/uploads/images/marketShare.png"
+              image={process.env.REACT_APP_ASSET_URL + "/uploads/images/marketShare.png"}
               alt={props.propertyTitle}
             />
           </div>
@@ -134,7 +134,7 @@ const ShareMarketItem = (props) => {
     //     <Link to={`/shares/${props.id}`}>
     //       <div className="share-item__image">
     //         <Avatar
-    //           image="http://localhost:5000/uploads/images/marketShare.png"
+    //           image={process.env.REACT_APP_ASSET_URL + "/uploads/images/marketShare.png"}
     //           alt={props.propertyTitle}
     //         />
     //       </div>
@@ -207,7 +207,7 @@ export default ShareMarketItem;
 //     try {
 //       //send http request via [http-hook] to the backend to delete the property
 //       await sendRequest(
-//         `http://localhost:5000/api/properties/${props.id}`,
+//         `${process.env.REACT_APP_BACKEND_URL}/properties/${props.id}`,
 //         "DELETE"
 //       );
 //       console.log("PropertyItem: " + props.id); //<--------- diagnostic ------------ DELETE ME ! ---------------------
@@ -252,7 +252,7 @@ export default ShareMarketItem;
 //         <Card className="property-item__content">
 //           {isLoading && <LoadingSpinner asOverlay />}
 //           <div className="property-item__image">
-//             <img src={`http://localhost:5000/${props.image}`} alt={props.title} />
+//             <img src={`${process.env.REACT_APP_ASSET_URL}/${props.image}`} alt={props.title} />
 //           </div>
 //           <div className="property-item__info">
 //             <h2>{props.title}</h2>

@@ -64,7 +64,7 @@ const ShareMarket = () => {
       try {
         //sending http request. [sendRequest] is a pointer to the function within the http hook and expects url and for the rest of the arguments will use default
         const responseData = await sendRequest(
-          `http://localhost:5000/api/properties/${propertyId}`
+          `${process.env.REACT_APP_BACKEND_URL}/properties/${propertyId}`
         );
         setLoadedProperty(responseData.property);
 
@@ -93,7 +93,7 @@ const ShareMarket = () => {
       try {
         //sending http request. [sendRequest] is a pointer to the function within the http hook and expects url and for the rest of the arguments will use default
         const responseData = await sendRequest(
-          `http://localhost:5000/api/shares/property/${propertyId}`
+          `${process.env.REACT_APP_BACKEND_URL}/shares/property/${propertyId}`
         );
 
         setLoadedShares(responseData.shares);
@@ -111,7 +111,7 @@ const ShareMarket = () => {
   //       try {
   //         //sending http request via the [http-hook]. [sendRequest] is a pointer and take arguments for url, method, body && headers
   //         const responseData = await sendRequest(
-  //           `http://localhost:5000/api/shares/${shareId}`
+  //           `${process.env.REACT_APP_BACKEND_URL}/shares/${shareId}`
   //         );
   //         //setting up state holding share data
   //         setLoadedShare(responseData.share);
@@ -144,7 +144,7 @@ const ShareMarket = () => {
   //     try {
   //       //sending http request via the [http-hook]. [sendRequest] is a pointer and take arguments for url, method, body && headers
   //       await sendRequest(
-  //         `http://localhost:5000/api/properties/${propertyId}`,
+  //         `${process.env.REACT_APP_BACKEND_URL}/properties/${propertyId}`,
   //         "PATCH",
   //         JSON.stringify({
   //           availableShares: formState.inputs.availableShares.value,
@@ -207,7 +207,7 @@ const ShareMarket = () => {
     try {
       //send http request via [http-hook] to the backend to buy fraction of the property
       await sendRequest(
-        `http://localhost:5000/api/shares/buy/${propertyId}`,
+        `${process.env.REACT_APP_BACKEND_URL}/shares/buy/${propertyId}`,
         "POST",
         JSON.stringify({
           //owner: auth.userId,

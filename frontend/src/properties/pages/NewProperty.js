@@ -86,7 +86,7 @@ const NewProperty = () => {
       console.log("hello1"); // <------ diagnostic -------- DELETE ME ! -----------
 
       await sendRequest(
-        "http://localhost:5000/api/properties",
+        process.env.REACT_APP_BACKEND_URL + "/properties",
         "POST",
         formData,
         { Authorization: 'Bearer ' + auth.token }

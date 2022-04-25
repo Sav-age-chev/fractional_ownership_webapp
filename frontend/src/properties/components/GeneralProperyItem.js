@@ -52,7 +52,7 @@ const GeneralPropertyItem = (props) => {
         <Card className="property-item__content">
           {isLoading && <LoadingSpinner asOverlay />}
           <div className="property-item__image">
-            <img src={`http://localhost:5000/${props.image}`} alt={props.title} />
+            <img src={`${process.env.REACT_APP_ASSET_URL}/${props.image}`} alt={props.title} />
           </div>
           <div className="property-item__info">
             <h2>{props.title}</h2>

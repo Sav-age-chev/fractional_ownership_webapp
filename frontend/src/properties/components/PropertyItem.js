@@ -54,7 +54,7 @@ const PropertyItem = (props) => {
           {isLoading && <LoadingSpinner asOverlay />}
           <div className="property-item__image">
             <img
-              src={`http://localhost:5000/${props.image}`}
+              src={`${process.env.REACT_APP_ASSET_URL}/${props.image}`}
               alt={props.title}
             />
           </div>
@@ -129,7 +129,7 @@ export default PropertyItem;
 //     try {
 //       //send http request via [http-hook] to the backend to delete the property
 //       await sendRequest(
-//         `http://localhost:5000/api/properties/${props.id}`,
+//         `${process.env.REACT_APP_BACKEND_URL}/properties/${props.id}`,
 //         "DELETE"
 //       );
 //       console.log("PropertyItem: " + props.id); //<--------- diagnostic ------------ DELETE ME ! ---------------------
@@ -174,7 +174,7 @@ export default PropertyItem;
 //         <Card className="property-item__content">
 //           {isLoading && <LoadingSpinner asOverlay />}
 //           <div className="property-item__image">
-//             <img src={`http://localhost:5000/${props.image}`} alt={props.title} />
+//             <img src={`${process.env.REACT_APP_ASSET_URL}/${props.image}`} alt={props.title} />
 //           </div>
 //           <div className="property-item__info">
 //             <h2>{props.title}</h2>
