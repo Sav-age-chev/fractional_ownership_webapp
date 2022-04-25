@@ -103,7 +103,7 @@ const UpdateProperty = () => {
           "Content-Type": "application/json",
         }
       );
-      history.push('/' + auth.userId + '/properties');
+      history.push("/" + auth.userId + "/properties");
     } catch (err) {}
   };
 
