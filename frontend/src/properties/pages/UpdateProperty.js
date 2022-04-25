@@ -138,7 +138,7 @@ const UpdateProperty = () => {
   //returns and display the response from the backend
   return (
     <React.Fragment>
-      <InfoModal info={<p>Hello Plamen</p>} infoState={showInfo} onClear={clearInfo}/> 
+      {/* <InfoModal info={<p>Hello Plamen</p>} infoState={showInfo} onClear={clearInfo}/>  */}
       <ErrorModal error={error} onClear={clearError} />
       {!isLoading && loadedProperty && (
         <form className="property-form" onSubmit={propertyUpdateSubmitHandler}>
