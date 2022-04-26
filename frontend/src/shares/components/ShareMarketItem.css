@@ -32,7 +32,7 @@
     border-top: 1px solid #ccc;
   }
   
-  .share-market-item__modal-content {
+  .card.share-market-item__modal-content {
     padding: 0;
   }
   
