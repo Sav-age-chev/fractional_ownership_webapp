@@ -8,7 +8,7 @@ const axios = require("axios");
 const HttpError = require("../models/http-error");
 
 //Google Cloud API key
-const API_KEY = "AIzaSyCQqxZJZzBhfurH17jAIQ6aHmAVtMpLaws";
+const API_KEY = process.env.GOOGLE_API_KEY;
 
 //function takes an address reaches to Google API and converts it to coordinates. [async] is allowing function to work with a promise(waiting)
 async function getCoordsForAddress(address) {
@@ -19,8 +19,6 @@ async function getCoordsForAddress(address) {
       address
     )}&key=${API_KEY}`
   );
-
-  //console.log(response.data);        //DELETE LATER ON
 
   //extracting only the required data from the response
   const data = response.data;

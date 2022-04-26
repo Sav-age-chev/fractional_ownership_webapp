@@ -4,6 +4,7 @@
 
 //import libraries
 //const uuid = require("uuid"); //generates IDs -----> D E L E T E   M E   A T   S O M E   P O I N T ! <-----
+const fs = require("fs");
 const { validationResult } = require("express-validator");
 const mongoose = require("mongoose");
 
@@ -12,18 +13,16 @@ const HttpError = require("../models/http-error");
 const getCoordsForAddress = require("../util/location");
 const Property = require("../models/property");
 const User = require("../models/user");
-//--------------------FOW-------------------------
-// const Share = require("../models/share");
-//--------------------FOW-------------------------
+const Share = require("../models/share");
 
 //--------------------FOW-------------------------
-// //get all properties
-// const getProperties = async (req, res, next) => {
+//get all properties
+// const getAllProperties = async (req, res, next) => {
 //   //instantiating new variable with scope of the object
 //   let properties;
 //   //fetching all properties excluding their [creator] field. Return error if method fails
 //   try {
-//     properties = await Property.find({}, "-creator");
+//     properties = await Property.find();
 //   } catch (err) {
 //     const error = new HttpError(
 //       "Something went wrong, please try again later",
@@ -36,6 +35,41 @@ const User = require("../models/user");
 //     properties: properties.map((property) => property.toObject({ getters: true })),
 //   });
 // };
+const getAllProperties = async (req, res, next) => {
+  console.log("getAllProperties - Hello1"); // <-------- diagnostic -------- DELETE ME ! ----------------------------------------------------------
+
+  //instantiating new variable with a scope of the method
+  let properties;
+  // ALTERNATIVE: let properties;
+
+  //get the properties by comparing user id from url against database creator field. Returns error if fail
+  try {
+    properties = await Property.find({});
+  } catch (err) {
+    const error = new HttpError(
+      "Fetching properties failed, please try again later.",
+      500
+    );
+    return next(error);
+  }
+
+  //returns error in case no properties was found
+  if (!properties || properties.length === 0) {
+    return next(new HttpError("Could not find any properties", 404));
+  }
+
+  //response to the request. Using [map] as we browse trough an array. Then covert to JavaScript object and activate the getters to get rid of the underscore
+  // res.json({
+  //   properties: userWithProperties.properties.map((property) =>
+  //     property.toObject({ getters: true })
+  //   ),
+  // });
+  res.json({
+    properties: properties.map((property) =>
+      property.toObject({ getters: true })
+    ),
+  });
+};
 //--------------------FOW-------------------------
 
 //get property by id. Asynchronous task
@@ -113,6 +147,55 @@ const getPropertiesByUserId = async (req, res, next) => {
   // });
 };
 
+//Get property by share id
+const getPropertyByShareId = async (req, res, next) => {
+  //get the share id from the url
+  const shareId = req.params.sid;
+
+  //instantiating new variable with a scope of the method
+  let tempShareProperty;
+  // ALTERNATIVE: let properties;
+
+  console.log(shareId); // <----------------------- DELETE ME ! --------------------------
+
+  //get the property by comparing share id from url against database shareProperty field. Returns error if fail
+  try {
+    tempShareProperty = await Share.findById(shareId).populate("shareProperty");
+    // ALTERNATIVE: properties = await Property.find({ creator: userId });
+  } catch (err) {
+    const error = new HttpError(
+      "Fetching property failed, please try again later.",
+      500
+    );
+    return next(error);
+  }
+
+  //returns error in case no property was found
+  if (!tempShareProperty || tempShareProperty.shareProperty.length === 0) {
+    // ALTERNATIVE: if (!properties || properties.length === 0) {
+    return next(
+      new HttpError("Could not find property for the provided share id.", 404)
+    );
+  }
+
+  //response to the request. Covert [property] to JavaScript object. {getters: true} removes the underscore from the id
+  res.json({
+    property: tempShareProperty.shareProperty.toObject({ getters: true }),
+  });
+
+  //response to the request. Using [map] as we browse trough an array. Then covert to JavaScript object and activate the getters to get rid of the underscore
+  // res.json({
+  //   properties: tempShareProperty.properties.map((property) =>
+  //     property.toObject({ getters: true })
+  //   ),
+  // });
+  //    ALTERNATIVE: res.json({
+  //     properties: properties.map((property) =>
+  //     property.toObject({ getters: true })
+  //   ),
+  // });
+};
+
 //create new property
 const createProperty = async (req, res, next) => {
   //check validation results and return error in case is not empty
@@ -124,8 +207,10 @@ const createProperty = async (req, res, next) => {
   }
 
   //object destructuring
-  const { title, description, address, creator, price, availableShares } =
-    req.body;
+  const { title, description, address, price } = req.body;
+
+  //retrieving the userId from the authorisation token instead the body of the request, as it is more secure
+  const creator = req.userData.userId;
 
   //convert address to coordinates
   let coordinates;
@@ -143,13 +228,14 @@ const createProperty = async (req, res, next) => {
     description,
     address,
     location: coordinates,
-    image:
-      "https://images.pexels.com/photos/614810/pexels-photo-614810.jpeg?auto=compress&cs=tinysrgb&dpr=3&h=750&w=1260/",
-    creator,
+    image: req.file.path,
+    //image,
+    //image: "uploads/images/510e23c0-9fde-11ec-808e-79d66390cc23.png",
+    creator: req.userData.userId,
     //--------------------FOW-------------------------
     propertyShares: [],
     price,
-    availableShares,
+    availableShares: 100,
     //--------------------FOW-------------------------
   });
 
@@ -176,26 +262,32 @@ const createProperty = async (req, res, next) => {
     return next(error);
   }
 
+  console.log(user);
+
   //try to add new property to the database with the async method [save()]. Catch and display error if fail
-  // NOTE: if we dont have collection [properties], will have to created manually !!!
+  // NOTE: if we dont have collection, will have to created manually !!!
   try {
     //starting session
     const sess = await mongoose.startSession();
     //starting a transaction
     sess.startTransaction();
     //saves the property
+    //await createdProperty.save();
     await createdProperty.save({ session: sess });
     //adding the property id to the user
     user.properties.push(createdProperty);
     //saves the user
+    //await user.save();
     await user.save({ session: sess });
     //session commits the transaction if all previous commands has been executed successfully
     await sess.commitTransaction();
   } catch (err) {
+    console.log(err);
     const error = new HttpError(
       "Creating new property failed, please try again.",
       500
     );
+    console.log("hello", error);
     return next(error);
   }
 
@@ -436,7 +528,16 @@ const updateProperty = async (req, res, next) => {
     return next(error);
   }
 
-  // 
+  //checking if the creator user has sent the request
+  if (property.creator.toString() !== req.userData.userId) {
+    const error = new HttpError(
+      "User not authorised to amend this property.",
+      401
+    );
+    return next(error);
+  }
+
+  //updating object
   property.title = title;
   property.description = description;
 
@@ -483,6 +584,22 @@ const deleteProperty = async (req, res, next) => {
     return next(error);
   }
 
+  console.log(
+    "Delete property: " + property.creator + " = " + req.userData.userId
+  ); // <-------- diagnostic -------- DELETE ME ! ----------------------------------------------------------
+
+  //checking if the creator user has sent the request
+  if (property.creator.id !== req.userData.userId) {
+    const error = new HttpError(
+      "User not authorised to delete this property.",
+      401
+    );
+    return next(error);
+  }
+
+  //get the image path
+  const imagePath = property.image;
+
   //try to delete property from database with an asynchronous method. Catch and displays error if it fail
   try {
     //starting new session
@@ -504,13 +621,20 @@ const deleteProperty = async (req, res, next) => {
     );
   }
 
+  //delete image if the execution reach this point
+  fs.unlink(imagePath, (err) => {
+    console.log(err);
+  });
+
   //response to the request
   res.status(200).json({ message: "Property deleted." });
 };
 
 //exporting functions pointers rather than executables
+exports.getAllProperties = getAllProperties;
 exports.getPropertyById = getPropertyById;
 exports.getPropertiesByUserId = getPropertiesByUserId;
+exports.getPropertyByShareId = getPropertyByShareId;
 exports.createProperty = createProperty;
 exports.updateProperty = updateProperty;
 exports.deleteProperty = deleteProperty;

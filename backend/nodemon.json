@@ -1,0 +1,9 @@
+{
+    "env": {
+        "DB_USER": "Savchev",
+        "DB_PASSWORD": "namkaq-cicpap-5vycZo",
+        "DB_NAME": "fow",
+        "GOOGLE_API_KEY": "AIzaSyDwdfrF0Zik-G9rKsTBXBQ3jODK4OPiouE",
+        "JWT_KEY": "private_key_user"
+    }
+}

@@ -1,0 +1,46 @@
+.share-market-item {
+    margin: 1rem 0;
+    width: 100%;
+  }
+  
+  .share-market-item__content {
+    padding: 0;
+  }
+  
+  .share-market-item__info {
+    padding: 2rem;
+    text-align: right;
+  }
+  
+  .share-market-item__image {
+    float: left;
+    width: 35%;
+    height: 35%;
+    margin-right: 1rem;
+    margin-top: 0.5rem;
+  }
+
+  .share-market-item__info h2,
+  .share-market-item__info h3,
+  .share-market-item__info p {
+    margin: 0 0 0.5rem 0;
+  }
+  
+  .share-market-item__actions {
+    padding: 1rem;
+    text-align: center;
+    border-top: 1px solid #ccc;
+  }
+  
+  .share-market-item__modal-content {
+    padding: 0;
+  }
+  
+  .share-market-item__modal-actions {
+    text-align: right;
+  }
+  
+  .share-market-item__actions button,
+  .share-market-item__actions a {
+    margin: 0.5rem;
+  }

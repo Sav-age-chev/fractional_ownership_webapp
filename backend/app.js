@@ -4,6 +4,8 @@
  */
 
 //import libraries
+const fs = require("fs");
+const path = require("path");
 const express = require("express");
 const bodyParser = require("body-parser");
 const mongoose = require("mongoose");
@@ -24,6 +26,25 @@ const app = express();
 //Once data is collected, [next()] is automatically called, next method triggered and receives the newly collected data
 app.use(bodyParser.json());
 
+//handle image requests. [express.static] just returns requested file without executing it
+app.use("/uploads/images", express.static(path.join("uploads", "images")));
+
+//adding headers to each request
+app.use((req, res, next) => {
+  //allows any domain to send request and prevent CORS errors
+  res.setHeader("Access-Control-Allow-Origin", "*");
+  //type headers that are allowed access
+  res.setHeader(
+    "Access-Control-Allow-Headers",
+    "Origin, X-Requested-With, Content-Type, Accept, Authorization"
+  ); 
+  //which HTTP methods are allowed to use on the front end/attached to the coming request
+  res.setHeader("Access-Control-Allow-Methods", "GET, POST, PATCH, DELETE");
+  //let the request continue
+  next();
+});
+
+//routes
 app.use("/api/properties", propertiesRoutes);
 app.use("/api/users", usersRoutes);
 app.use("/api/shares", sharesRoutes);
@@ -36,6 +57,13 @@ app.use((req, res, next) => {
 
 //handling route errors. Below function will be called if there is an error with the request
 app.use((error, req, res, next) => {
+  //if there is an error system rollback and delete uploaded images
+  if (req.file) {
+    fs.unlink(req.file.path, (err) => {
+      console.log(err); // <---- diagnostic ------ DELETE ME ! -------
+    });
+  }
+
   if (res.headerSent) {
     return next(error);
   }
@@ -50,13 +78,15 @@ app.use((error, req, res, next) => {
 //[connect()] connect to the database as an asynchronous. [then()] if successful listen to the port or returns an error
 mongoose
   .connect(
-    "mongodb+srv://Savchev:namkaq-cicpap-5vycZo@cluster0.3mjmp.mongodb.net/properties?retryWrites=true&w=majority"
+    //dynamically inserting database credential hold in environmental variable. [process] is global variable that is always available. [env] is a key
+    `mongodb+srv://${process.env.DB_USER}:${process.env.DB_PASSWORD}@cluster0.3mjmp.mongodb.net/${process.env.DB_NAME}?retryWrites=true&w=majority`,
+    { useNewUrlParser: true, useUnifiedTopology: true }
   )
   .then(() => {
     //listen to certain port
-    app.listen(5000);
+    app.listen(process.env.PORT || 5000);
   })
   .catch((err) => {
     console.log(err);
   });
-  //---------------------Database------------------------------
+//---------------------Database------------------------------

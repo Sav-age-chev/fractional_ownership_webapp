@@ -22,13 +22,12 @@ const userSchema = new Schema({
       ref: "Property",
     },
   ],
-  //-------------------------FOW----------------------------
   userShares: [{ type: mongoose.Types.ObjectId, required: true, ref: "Share" }],
-  //-------------------------FOW----------------------------
+  admin: { type: Boolean, default: false },
 });
 
-//add the unique validator to the schema
-userSchema.plugin(uniqueValidator);
+//add the unique validator to the schema - there is some issue with the mongoose and the validator
+//userSchema.plugin(uniqueValidator);
 
 //export model
 module.exports = mongoose.model("User", userSchema);

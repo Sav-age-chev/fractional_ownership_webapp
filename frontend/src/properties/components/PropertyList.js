@@ -7,7 +7,7 @@ import PropertyItem from "./PropertyItem";
 import "./PropertyList.css";
 
 /*
- * [PropertyList] components used to display list of users
+ * [PropertyList] components used to display list of properties
  */
 
 const PropertyList = (props) => {
@@ -28,16 +28,19 @@ const PropertyList = (props) => {
         <PropertyItem
           key={property.id}
           id={property.id}
-          image={property.imageUrl}
+          image={property.image}
           title={property.title}
           description={property.description}
           address={property.address}
+          price={property.price}
           creatorId={property.creator}
           coordinates={property.location}
+          onDelete={props.onDeleteProperty}
         />
       ))}
     </ul>
   );
 };
 
+//export method
 export default PropertyList;

@@ -24,6 +24,7 @@ const propertySchema = new Schema({
   //owners: [{ type: mongoose.Types.ObjectId, required: false, ref: "Share" }],
   price: { type: Number, required: true },
   availableShares: { type: Number, required: true },
+  approved: { type: Boolean, default: true },
   //-------------------------FOW----------------------------
 });
 
