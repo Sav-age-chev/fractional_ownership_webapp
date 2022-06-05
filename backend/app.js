@@ -60,7 +60,6 @@ app.use((error, req, res, next) => {
   //if there is an error system rollback and delete uploaded images
   if (req.file) {
     fs.unlink(req.file.path, (err) => {
-      console.log(err); // <---- diagnostic ------ DELETE ME ! -------
     });
   }
 

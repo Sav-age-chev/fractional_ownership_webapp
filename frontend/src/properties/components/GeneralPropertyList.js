@@ -2,7 +2,7 @@ import React from "react";
 
 import Card from "../../shared/components/UIElements/Card";
 import Button from "../../shared/components/FormElements/Button";
-import GeneralPropertyItem from "./GeneralProperyItem";
+import GeneralPropertyItem from "./GeneralPropertyItem";
 
 import "./PropertyList.css";
 
@@ -11,12 +11,11 @@ import "./PropertyList.css";
  */
 
 const GeneralPropertyList = (props) => {
-  if (props.items.length === 0) {
+  if (!props.items || props.items.length === 0) {
     return (
       <div className="property-list center">
         <Card>
           <h2>No properties found. Post advert?</h2>
-          <Button to="/properties/new">POST ADVERT</Button>
         </Card>
       </div>
     );
