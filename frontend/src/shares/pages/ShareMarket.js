@@ -34,6 +34,7 @@ const ShareMarket = () => {
   //instantiating state
   const [loadedProperty, setLoadedProperty] = useState();
   const [loadedShares, setLoadedShares] = useState();
+  const [newShareCost, setNewShareCost] = useState(0.00);
   const [showConfirmModal, setShowConfirmModal] = useState(false);
 
   //object destructuring
@@ -63,7 +64,7 @@ const ShareMarket = () => {
       try {
         //sending http request. [sendRequest] is a pointer to the function within the http hook and expects url and for the rest of the arguments will use default
         const responseData = await sendRequest(
-          `http://localhost:5000/api/properties/${propertyId}`
+          `${process.env.REACT_APP_BACKEND_URL}/properties/${propertyId}`
         );
         setLoadedProperty(responseData.property);
 
@@ -92,7 +93,7 @@ const ShareMarket = () => {
       try {
         //sending http request. [sendRequest] is a pointer to the function within the http hook and expects url and for the rest of the arguments will use default
         const responseData = await sendRequest(
-          `http://localhost:5000/api/shares/property/${propertyId}`
+          `${process.env.REACT_APP_BACKEND_URL}/shares/property/${propertyId}`
         );
 
         setLoadedShares(responseData.shares);
@@ -110,7 +111,7 @@ const ShareMarket = () => {
   //       try {
   //         //sending http request via the [http-hook]. [sendRequest] is a pointer and take arguments for url, method, body && headers
   //         const responseData = await sendRequest(
-  //           `http://localhost:5000/api/shares/${shareId}`
+  //           `${process.env.REACT_APP_BACKEND_URL}/shares/${shareId}`
   //         );
   //         //setting up state holding share data
   //         setLoadedShare(responseData.share);
@@ -143,7 +144,7 @@ const ShareMarket = () => {
   //     try {
   //       //sending http request via the [http-hook]. [sendRequest] is a pointer and take arguments for url, method, body && headers
   //       await sendRequest(
-  //         `http://localhost:5000/api/properties/${propertyId}`,
+  //         `${process.env.REACT_APP_BACKEND_URL}/properties/${propertyId}`,
   //         "PATCH",
   //         JSON.stringify({
   //           availableShares: formState.inputs.availableShares.value,
@@ -191,6 +192,7 @@ const ShareMarket = () => {
   const showBuyWarningHandler = (event) => {
     //prevent the default submission of the form
     event.preventDefault();
+    calculateShareCost();
     setShowConfirmModal(true);
   };
 
@@ -205,13 +207,13 @@ const ShareMarket = () => {
     try {
       //send http request via [http-hook] to the backend to buy fraction of the property
       await sendRequest(
-        `http://localhost:5000/api/shares/buy/${propertyId}`,
+        `${process.env.REACT_APP_BACKEND_URL}/shares/buy/${propertyId}`,
         "POST",
         JSON.stringify({
           //owner: auth.userId,
           shareProperty: propertyId,
           propertyTitle: loadedProperty.title,
-          cost: "35300",
+          cost: newShareCost,
           share: formState.inputs.share.value,
         }),
         {
@@ -225,14 +227,13 @@ const ShareMarket = () => {
 
   //calculate current value
   const calculateShareCost = () => {
-    let shareCost = 0.0;
+    let shareCost;
     if (loadedProperty) {
       shareCost = parseFloat(
-        // (formState.inputs.share.value / 100) * loadedProperty.price
-        (20 / 100) * loadedProperty.price
+        (formState.inputs.share.value / 100) * loadedProperty.price
       ).toFixed(2);
     }
-    return shareCost;
+    setNewShareCost(shareCost);
   };
 
   //function triggered upon sell that filter the share list by comparing against the id of recently deleted
@@ -263,6 +264,8 @@ const ShareMarket = () => {
           </React.Fragment>
         }
       >
+        {/* <h4>{formState.inputs.share.value}% of the property</h4> */}
+        <h4>Cost: £{newShareCost}</h4>
         <p>Do you want to proceed and buy fraction of this property?</p>
       </Modal>
 
@@ -286,7 +289,6 @@ const ShareMarket = () => {
       {loadedProperty.availableShares > 0 && (
         <form
           className="share-form"
-          // onSubmit={showBuyWarningHandler}
         >
           <h3 className="center">INITIAL SALE: </h3>
           <h4>What fraction of the property would you like to buy?</h4>
@@ -301,9 +303,9 @@ const ShareMarket = () => {
             initialValue={loadedProperty.availableShares}
             initialValid={true}
           />
-          <h4>Cost: {calculateShareCost()}</h4>
+          <h4>Cost: {newShareCost}</h4>
           <div className="share-item__actions">
-            <Button type="submit" onClick={showBuyWarningHandler}>
+            <Button type="submit" disabled={!loadedProperty.approved} onClick={showBuyWarningHandler}>
               BUY
             </Button>
           </div>
@@ -319,25 +321,6 @@ const ShareMarket = () => {
         />
       </div>
 
-      {/* <div className="marketplace">
-        <h2>MARKETPLACE: </h2>
-        <ShareMarketList items={loadedShares} onSoldShare={soldShareHandler} />
-      </div> */}
-      {/* {loadedShare.forSale && (
-        <form className="share-form" onSubmit={shareUpdateSubmitHandler}>
-          <div className="">
-            <h3 className="center">FRACTION OWNERSHIP:</h3>
-          </div>
-          <div>
-            <h4>Share of the property: {loadedShare.share}%</h4>
-            <h4>Market value: {calculateCurrentPropertyValue()}</h4>
-            <h4>Asking price: {loadedShare.sellPrice}</h4>
-          </div>
-          <Button type="submit"onClick={showBuyWarningHandler}>
-            BUY
-          </Button>
-        </form>
-      )} */}
     </React.Fragment>
   );
 };

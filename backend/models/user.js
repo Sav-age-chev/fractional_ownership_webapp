@@ -22,9 +22,8 @@ const userSchema = new Schema({
       ref: "Property",
     },
   ],
-  //-------------------------FOW----------------------------
   userShares: [{ type: mongoose.Types.ObjectId, required: true, ref: "Share" }],
-  //-------------------------FOW----------------------------
+  admin: { type: Boolean, default: false },
 });
 
 //add the unique validator to the schema - there is some issue with the mongoose and the validator

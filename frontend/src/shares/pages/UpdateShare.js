@@ -69,7 +69,7 @@ const UpdateShare = () => {
   //     try {
   //       //sending http request. [sendRequest] is a pointer to the function within the http hook and expects url and for the rest of the arguments will use default
   //       const responseData = await sendRequest(
-  //         `http://localhost:5000/api/properties/share/${shareId}`
+  //         `${process.env.REACT_APP_BACKEND_URL}/properties/share/${shareId}`
   //       );
   //       setLoadedProperty(responseData.property);
   //     } catch (err) {}
@@ -84,7 +84,7 @@ const UpdateShare = () => {
       try {
         //sending http request. [sendRequest] is a pointer to the function within the http hook and expects url and for the rest of the arguments will use default
         const responseData = await sendRequest(
-          `http://localhost:5000/api/properties/share/${shareId}`
+          `${process.env.REACT_APP_BACKEND_URL}/properties/share/${shareId}`
         );
         setLoadedProperty(responseData.property);
       } catch (err) {}
@@ -99,7 +99,7 @@ const UpdateShare = () => {
       try {
         //sending http request via the [http-hook]. [sendRequest] is a pointer and take arguments for url, method, body && headers
         const responseData = await sendRequest(
-          `http://localhost:5000/api/shares/${shareId}`
+          `${process.env.REACT_APP_BACKEND_URL}/shares/${shareId}`
         );
         //setting up state holding share data
         setLoadedShare(responseData.share);
@@ -133,7 +133,7 @@ const UpdateShare = () => {
     try {
       //sending http request via the [http-hook]. [sendRequest] is a pointer and take arguments for url, method, body && headers
       await sendRequest(
-        `http://localhost:5000/api/shares/edit/${shareId}`,
+        `${process.env.REACT_APP_BACKEND_URL}/shares/edit/${shareId}`,
         "PATCH",
         JSON.stringify({
           //share: formState.inputs.share.value,
@@ -237,9 +237,9 @@ const UpdateShare = () => {
           </div>
           <div>
             <h4>Owned percentile: {loadedShare.share}%</h4>
-            <h4>Initial cost: {parseFloat(loadedShare.cost).toFixed(2)}</h4>
-            <h4>Market value: {calculateCurrentPropertyValue()}</h4>
-            <h4>Profit/Loss: {calculateCurrentProfitLoss()}</h4>
+            <h4>Initial cost: £{parseFloat(loadedShare.cost).toFixed(2)}</h4>
+            <h4>Market value: £{calculateCurrentPropertyValue()}</h4>
+            <h4>Profit/Loss: £{calculateCurrentProfitLoss()}</h4>
             <h4>For sale: {(loadedShare.forSale && "YES") || "NO"}</h4>
           </div>
           <Input

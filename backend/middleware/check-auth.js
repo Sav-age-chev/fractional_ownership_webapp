@@ -24,7 +24,7 @@ module.exports = (req, res, next) => {
     }
 
     //verifying the request using th private key and its counterpart token. Returns error if fails
-    const decodedToken = jwt.verify(token, "private_key_user");
+    const decodedToken = jwt.verify(token, process.env.JWT_KEY);
 
     console.log("Passing authentication: " + decodedToken.userId.toString()); // <-------- diagnostic -------- DELETE ME ! ----------------------------------------------------------
 

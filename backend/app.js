@@ -60,7 +60,6 @@ app.use((error, req, res, next) => {
   //if there is an error system rollback and delete uploaded images
   if (req.file) {
     fs.unlink(req.file.path, (err) => {
-      console.log(err); // <---- diagnostic ------ DELETE ME ! -------
     });
   }
 
@@ -78,13 +77,13 @@ app.use((error, req, res, next) => {
 //[connect()] connect to the database as an asynchronous. [then()] if successful listen to the port or returns an error
 mongoose
   .connect(
-    //"mongodb+srv://Savchev:namkaq-cicpap-5vycZo@cluster0.3mjmp.mongodb.net/properties?retryWrites=true&w=majority"
-    "mongodb+srv://Savchev:namkaq-cicpap-5vycZo@cluster0.3mjmp.mongodb.net/fow?retryWrites=true&w=majority",
+    //dynamically inserting database credential hold in environmental variable. [process] is global variable that is always available. [env] is a key
+    `mongodb+srv://${process.env.DB_USER}:${process.env.DB_PASSWORD}@cluster0.3mjmp.mongodb.net/${process.env.DB_NAME}?retryWrites=true&w=majority`,
     { useNewUrlParser: true, useUnifiedTopology: true }
   )
   .then(() => {
     //listen to certain port
-    app.listen(5000);
+    app.listen(process.env.PORT || 5000);
   })
   .catch((err) => {
     console.log(err);

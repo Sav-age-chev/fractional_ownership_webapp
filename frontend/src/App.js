@@ -4,7 +4,7 @@
  */
 
 //import libraries
-import React, { useState, useCallback, useEffect } from "react";
+import React, { Suspense } from "react";
 import {
   BrowserRouter as Router,
   Route,
@@ -13,21 +13,39 @@ import {
 } from "react-router-dom";
 
 //local imports
-import Auth from "./user/pages/Auth";
-import Users from "./user/pages/Users";
-import Shares from "./shares/pages/Shares";
-import ShareMarket from "./shares/pages/ShareMarket";
-import UpdateShare from "./shares/pages/UpdateShare";
-import NewProperty from "./properties/pages/NewProperty";
-import AllProperties from "./properties/pages/AllProperties";
-import UpdateProperty from "./properties/pages/UpdateProperty";
-import UserProperties from "./properties/pages/UserProperties";
+//import Auth from "./user/pages/Auth";
+//import Users from "./user/pages/Users";
+//import Shares from "./shares/pages/Shares";
+//import ShareMarket from "./shares/pages/ShareMarket";
+//import UpdateShare from "./shares/pages/UpdateShare";
+//import NewProperty from "./properties/pages/NewProperty";
+//import AllProperties from "./properties/pages/AllProperties";
+//import UpdateProperty from "./properties/pages/UpdateProperty";
+//import UserProperties from "./properties/pages/UserProperties";
 import MainNavigation from "./shared/components/Navigation/MainNavigation";
+import LoadingSpinner from "./shared/components/UIElements/LoadingSpinner";
 import { useAuth } from "./shared/hooks/auth-hook";
 import { AuthContext } from "./shared/context/auth-context";
 
 //styling sheet
 import "./App.css";
+
+//code splitting - rendering the imports dynamically
+const Auth = React.lazy(() => import("./user/pages/Auth"));
+const Users = React.lazy(() => import("./user/pages/Users"));
+const Shares = React.lazy(() => import("./shares/pages/Shares"));
+const ShareMarket = React.lazy(() => import("./shares/pages/ShareMarket"));
+const UpdateShare = React.lazy(() => import("./shares/pages/UpdateShare"));
+const NewProperty = React.lazy(() => import("./properties/pages/NewProperty"));
+const AllProperties = React.lazy(() =>
+  import("./properties/pages/AllProperties")
+);
+const UpdateProperty = React.lazy(() =>
+  import("./properties/pages/UpdateProperty")
+);
+const UserProperties = React.lazy(() =>
+  import("./properties/pages/UserProperties")
+);
 
 const App = () => {
   //object destructuring
@@ -36,6 +54,23 @@ const App = () => {
   //instantiating local variable with the scope of the method
   let routes;
 
+  // if (admin) {
+  //   <Switch>
+  //     {/* Create exact routing. "/" is a filter */}
+  //     <Route path="/" exact>
+  //       <AllProperties />
+  //     </Route>
+  //     {/* Create exact routing. "/" is a filter */}
+  //     <Route path="/users" exact>
+  //       <Users />
+  //     </Route>
+  //     {/* Create routing. "/auth" is a filter */}
+  //     <Route path="/auth">
+  //       <Auth />
+  //     </Route>
+  //     {/* If the path after the / is invalid user will be redirected back */}
+  //     <Redirect to="/auth" />
+  //   </Switch>;
   if (token) {
     routes = (
       <Switch>
@@ -95,6 +130,10 @@ const App = () => {
         <Route path="/properties/list" exact>
           <AllProperties />
         </Route>
+        {/* Create exact routing. "/properties/new" is a filter */}
+        <Route path="/properties/list" exact>
+          <AllProperties />
+        </Route>
         {/* Create routing. "/auth" is a filter */}
         <Route path="/auth">
           <Auth />
@@ -119,7 +158,17 @@ const App = () => {
       {/* Context component have to be around all the components that will use it */}
       <Router>
         <MainNavigation />
-        <main>{routes}</main>
+        <main>
+          <Suspense
+            fallback={
+              <div className="center">
+                <LoadingSpinner />
+              </div>
+            }
+          >
+            {routes}
+          </Suspense>
+        </main>
       </Router>
     </AuthContext.Provider>
   );

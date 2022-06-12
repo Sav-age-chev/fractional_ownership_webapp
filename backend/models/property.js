@@ -19,12 +19,10 @@ const propertySchema = new Schema({
     lng: { type: Number, required: true },
   },
   creator: { type: mongoose.Types.ObjectId, required: true, ref: "User" },
-  //-------------------------FOW----------------------------
   propertyShares: [{ type: mongoose.Types.ObjectId, required: true, ref: "Share" }],
-  //owners: [{ type: mongoose.Types.ObjectId, required: false, ref: "Share" }],
   price: { type: Number, required: true },
   availableShares: { type: Number, required: true },
-  //-------------------------FOW----------------------------
+  approved: { type: Boolean, default: true },
 });
 
 //export model

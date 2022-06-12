@@ -29,12 +29,12 @@ const Shares = () => {
       try {
         //sending http request. [sendRequest] is a pointer to the function within the http hook and expects url and for the rest of the arguments will use default
         const responseData = await sendRequest(
-          `http://localhost:5000/api/shares/user/${auth.userId}`
+          `${process.env.REACT_APP_BACKEND_URL}/shares/user/${auth.userId}`
         );
 
         setLoadedShares(responseData.shares);
 
-        console.log(responseData.shares);     // <----------- diagnostic ------------- PLEASE DELETE ME ! -------------------
+        console.log(responseData.shares); // <----------- diagnostic ------------- PLEASE DELETE ME ! -------------------
       } catch (err) {}
     };
     fetchShares();
@@ -42,13 +42,13 @@ const Shares = () => {
 
   return (
     <React.Fragment>
-      <ErrorModal error={error} onClear={clearError} />
+      {/* <ErrorModal error={error} onClear={clearError} /> */}
       {isLoading && (
         <div className="center">
           <LoadingSpinner />
         </div>
       )}
-      {!isLoading && loadedShares && <SharesList items={loadedShares} />}
+      {!isLoading && <SharesList items={loadedShares} />}
     </React.Fragment>
   );
 };

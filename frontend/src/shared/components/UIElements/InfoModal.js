@@ -1,5 +1,5 @@
 /*
- * [ErrorModel.js] render error modal component
+ * [InfoModel.js] component is used to display current page information
  */
 
 //import libraries
@@ -9,19 +9,19 @@ import React from "react";
 import Modal from "./Modal";
 import Button from "../FormElements/Button";
 
-//function
-const ErrorModal = (props) => {
+const InfoModal = (props) => {
+  
   return (
     <Modal
       onCancel={props.onClear}
-      header="An Error Occurred!"
-      show={!!props.error}
+      header="Information!"
+      show={props.infoState}
       footer={<Button onClick={props.onClear}>Okay</Button>}
     >
-      <p>{props.error}</p>
+      {props.info}
     </Modal>
   );
 };
 
 //export component
-export default ErrorModal;
+export default InfoModal;

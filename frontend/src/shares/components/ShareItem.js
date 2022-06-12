@@ -21,13 +21,13 @@ const ShareItem = (props) => {
         <Link to={`/shares/${props.id}`}>
           <div className="share-item__image">
             <Avatar
-              image="http://localhost:5000/uploads/images/share.png"
+              image={process.env.REACT_APP_ASSET_URL + "/uploads/images/share.png"}
               alt={props.propertyTitle}
             />
           </div>
           <div className="share-item__info">
             <h2>{props.propertyTitle}</h2>
-            <h3>Cost: {props.cost}</h3>
+            <h3>Cost: £{props.cost}</h3>
             <h3>
               {" "}
               Own: {props.shares} {props.shares === 1 ? "Percent" : "Percents"}

@@ -31,7 +31,7 @@ const UserProperties = () => {
       try {
         //sending http request. [sendRequest] is a pointer to the function within the http hook and expects url and for the rest of the arguments will use default
         const responseData = await sendRequest(
-          `http://localhost:5000/api/properties/user/${userId}`
+          `${process.env.REACT_APP_BACKEND_URL}/properties/user/${userId}`
         );
         setLoadedProperties(responseData.properties);
       } catch (err) {}
@@ -55,7 +55,7 @@ const UserProperties = () => {
           <LoadingSpinner />
         </div>
       )}
-      {!isLoading && loadedProperties && (
+      {!isLoading && (
         <UserPropertyList
           items={loadedProperties}
           onDeleteProperty={propertyDeletedHandler}
