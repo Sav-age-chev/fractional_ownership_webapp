@@ -83,7 +83,6 @@ const NewProperty = () => {
       //formData.append("creator", auth.userId);
       formData.append("image", formState.inputs.image.value);
 
-      console.log("hello1"); // <------ diagnostic -------- DELETE ME ! -----------
 
       await sendRequest(
         process.env.REACT_APP_BACKEND_URL + "/properties",
@@ -95,7 +94,6 @@ const NewProperty = () => {
       //redirect user to different page
       history.push("/");
     } catch (err) {
-      console.log("error apparently"); // <------ diagnostic -------- DELETE ME ! -----------
     }
   };
 

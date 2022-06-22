@@ -63,9 +63,7 @@ const getSharesByUserId = async (req, res, next) => {
     );
     return next(error);
   }
-
-  console.log(userWithShares); // <------- diagnostic --------- PLEASE DELETE ME ! ----------
-
+  
   //returns error in case no share was found
   if (!userWithShares || userWithShares.userShares.length === 0) {
     return next(
@@ -132,17 +130,6 @@ const buyPropertyShare = async (req, res, next) => {
   //get userId from the authorisation token as it is more secure
   const owner = req.userData.userId;
 
-  console.log(
-    "Request body: " +
-      shareProperty +
-      " " +
-      propertyTitle +
-      " " +
-      cost +
-      " " +
-      share
-  ); // <---------- diagnostic ---------- PLEASE DELETE ME ! ---------
-
   //check validation results and return error in case is not empty
   const errors = validationResult(req);
   if (!errors.isEmpty()) {
@@ -151,15 +138,11 @@ const buyPropertyShare = async (req, res, next) => {
     );
   }
 
-  //get data from the body
-  //const { owner, shareProperty, propertyTitle, cost, share } = req.body;
   //get id from the url
   const propertyId = req.params.pid;
 
   //instantiating new variable with a scope of the method
   let property;
-
-  console.log("Now! " + propertyId); // <---------- diagnostic ---------- PLEASE DELETE ME ! ---------
 
   //instantiating new object using the blueprint from models
   const createdShare = new Share({
@@ -171,21 +154,16 @@ const buyPropertyShare = async (req, res, next) => {
     share,
   });
 
-  console.log("New Share " + createdShare); // <---------- diagnostic ---------- PLEASE DELETE ME ! ---------
-
   //try to get property by id from database with an asynchronous method. Catch and displays error if it fail
   try {
     property = await Property.findById(shareProperty);
   } catch (err) {
-    console.log("We have a problem here!"); // <---------- diagnostic ---------- PLEASE DELETE ME ! ---------
     const error = new HttpError(
       "Something went wrong, could not retrieve the property data.",
       500
     );
     return next(error);
   }
-
-  console.log(property); // <---------- diagnostic ---------- PLEASE DELETE ME ! ---------
 
   //returns error if property variable is empty or there not enough available shares
   if (!property) {
@@ -225,10 +203,6 @@ const buyPropertyShare = async (req, res, next) => {
     const error = new HttpError("Could not find user for the provided id", 404);
     return next(error);
   }
-
-  console.log(
-    "Update share owner" + user.id.toString() + " = " + req.userData.userId
-  ); // <-------- diagnostic -------- DELETE ME ! ----------------------------------------------------------
 
   //checking if the creator user has sent the request
   if (user.id.toString() !== req.userData.userId) {
@@ -300,9 +274,6 @@ const sellPropertyShare = async (req, res, next) => {
     return next(error);
   }
 
-  //diagnostic
-  console.log(share); // <------------------------------------- DELETE ME ! ----------------------------------------------
-
   //try to delete share from database with an asynchronous method. Catch and displays error if it fail
   try {
     //starting new session
@@ -314,7 +285,6 @@ const sellPropertyShare = async (req, res, next) => {
     //remove share
     await share.remove({ session: sess });
     //remove share from the property array
-    //share.property.owners.pull(share.user);
     share.shareProperty.propertyShares.pull(share);
     //saves the update
     await share.shareProperty.save({ session: sess });
@@ -337,10 +307,8 @@ const sellPropertyShare = async (req, res, next) => {
 
 //update existing share
 const updateShare = async (req, res, next) => {
-  //console.log(req); // <----------------------- DELETE ME ! ----------------------------------------------------------
   //check validation results and return error in case is not empty
   const errors = validationResult(req);
-  //console.log(errors); // <----------------------- DELETE ME ! ----------------------------------------------------------
   if (!errors.isEmpty()) {
     return next(
       new HttpError("Invalid inputs passed, please check your data.", 422)
@@ -352,23 +320,9 @@ const updateShare = async (req, res, next) => {
   //get id from the url
   const shareId = req.params.sid;
 
-  console.log(
-    "Passed data to shareUpdate: " + forSale + " " + shareId
-  ); // <----------------------- DELETE ME ! --------------------------
 
   //instantiating new variable with a scope of the method
   let share;
-
-  //try to get share by user and property id from database with an asynchronous method. Catch and displays error if it fail
-  // try {
-  //   share = await Share.find({owner: userId, shareProperty: propertyId });
-  // } catch (err) {
-  //   const error = new HttpError(
-  //     "Something went wrong, could not update share.",
-  //     500
-  //   );
-  //   return next(error);
-  // }
 
   try {
     share = await Share.findById(shareId);
@@ -389,10 +343,6 @@ const updateShare = async (req, res, next) => {
     return next(error);
   }
 
-  console.log(
-    "Update share " + share.owner.toString() + " = " + req.userData.userId
-  ); // <-------- diagnostic -------- DELETE ME ! ----------------------------------------------------------
-
   //checking if the creator user has sent the request
   if (share.owner.toString() !== req.userData.userId) {
     const error = new HttpError(
@@ -401,30 +351,6 @@ const updateShare = async (req, res, next) => {
     );
     return next(error);
   }
-
-  //get user if the share change ownership
-  // if (share.owner != owner) {
-  //   //check if the provided user id exists
-  //   let user;
-  //   try {
-  //     user = await User.findById(owner);
-  //   } catch (err) {
-  //     const error = new HttpError(
-  //       "Something went wrong, could not retrieve the user data.",
-  //       500
-  //     );
-  //     return next(error);
-  //   }
-
-  //   //check if user has been retrieved
-  //   if (!user) {
-  //     const error = new HttpError(
-  //       "Could not find user for the provided id",
-  //       404
-  //     );
-  //     return next(error);
-  //   }
-  // }
 
   //updating details
   if (forSale) {
@@ -449,10 +375,8 @@ const updateShare = async (req, res, next) => {
 
 //update existing share
 const updateSharesOwner = async (req, res, next) => {
-  //console.log(req); // <----------------------- DELETE ME ! ----------------------------------------------------------
   //check validation results and return error in case is not empty
   const errors = validationResult(req);
-  //console.log(errors); // <----------------------- DELETE ME ! ----------------------------------------------------------
   if (!errors.isEmpty()) {
     return next(
       new HttpError("Invalid inputs passed, please check your data.", 422)
@@ -466,10 +390,6 @@ const updateSharesOwner = async (req, res, next) => {
   //get id from the url
   const shareId = req.params.sid;
 
-  console.log(
-    "Passed data to shareUpdate: " + owner + " - " + sellPrice + " - " + shareId
-  ); // <----------------------- DELETE ME ! --------------------------
-
   //instantiating new variable with a scope of the method
   let share;
 
@@ -482,18 +402,6 @@ const updateSharesOwner = async (req, res, next) => {
     );
     return next(error);
   }
-
-  //-------------------------------------------------------------------------------------------------------------------
-  // try {
-  //   share = await Share.findById(shareId);
-  // } catch (err) {
-  //   const error = new HttpError(
-  //     "Something went wrong, could not update your share of the property.",
-  //     500
-  //   );
-  //   return next(error);
-  // }
-  //-------------------------------------------------------------------------------------------------------------------
 
   //check if share exist
   if (!share) {
@@ -524,10 +432,6 @@ const updateSharesOwner = async (req, res, next) => {
     return next(error);
   }
 
-  console.log(
-    "Update share owner" + user.id.toString() + " = " + req.userData.userId
-  ); // <-------- diagnostic -------- DELETE ME ! ----------------------------------------------------------
-
   //checking if the creator user has sent the request
   if (user.id.toString() !== req.userData.userId.toString()) {
     const error = new HttpError(
@@ -537,51 +441,12 @@ const updateSharesOwner = async (req, res, next) => {
     return next(error);
   }
 
-  //-------------------------------------------------------------------------------------------------------------------
-  // let oldUser;
-  // //retrieving the new user
-  // try {
-  //   oldUser = await User.findById(share.owner);
-  // } catch (err) {
-  //   const error = new HttpError(
-  //     "Something went wrong, could not retrieve the old user data.",
-  //     500
-  //   );
-  //   return next(error);
-  // }
-
-  // //check if new oldUser has been retrieved
-  // if (!oldUser) {
-  //   const error = new HttpError("Could not find old user for the provided id", 404);
-  //   return next(error);
-  // }
-  //-------------------------------------------------------------------------------------------------------------------
-
   //updating details
   share.forSale = !share.forSale;
   share.cost = sellPrice;
 
   //try to amend share in the database with the async method [save()]. Catch and display error if fail
   try {
-    //-------------------------------------------------------------------------------------------------------------------
-    // //starting new session
-    // const sess = await mongoose.startSession();
-    // //starting a transaction
-    // sess.startTransaction();
-    // //update the owner field in share
-    // share.owner = user;
-    // //save share
-    // await share.save();
-    // //remove share from the old user array
-    // oldUser.userShares.pull(share);
-    // //saves the update
-    // await oldUser.save({ session: sess });
-    // //add share to the new user array
-    // user.userShares.push(share);
-    // //saves the update
-    // await user.save();
-    // //update the owner field in share
-    //-------------------------------------------------------------------------------------------------------------------
     //starting new session
     const sess = await mongoose.startSession();
     //starting a transaction
