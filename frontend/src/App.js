@@ -13,15 +13,6 @@ import {
 } from "react-router-dom";
 
 //local imports
-//import Auth from "./user/pages/Auth";
-//import Users from "./user/pages/Users";
-//import Shares from "./shares/pages/Shares";
-//import ShareMarket from "./shares/pages/ShareMarket";
-//import UpdateShare from "./shares/pages/UpdateShare";
-//import NewProperty from "./properties/pages/NewProperty";
-//import AllProperties from "./properties/pages/AllProperties";
-//import UpdateProperty from "./properties/pages/UpdateProperty";
-//import UserProperties from "./properties/pages/UserProperties";
 import MainNavigation from "./shared/components/Navigation/MainNavigation";
 import LoadingSpinner from "./shared/components/UIElements/LoadingSpinner";
 import { useAuth } from "./shared/hooks/auth-hook";

@@ -46,7 +46,6 @@ const UserPropertyItem = (props) => {
   //delete property warning
   const showDeleteWarningHandler = () => {
     setShowConfirmModal(true);
-    console.log("Available shares: " + props.availableShares + " " + checkFullOwnership()); //<--------- diagnostic ------------ DELETE ME ! ---------------------
   };
 
   //cancel property deletion
@@ -65,7 +64,6 @@ const UserPropertyItem = (props) => {
         null,
         { Authorization: 'Bearer ' + auth.token }
       );
-      console.log("PropertyItem: " + props.id); //<--------- diagnostic ------------ DELETE ME ! ---------------------
       props.onDelete(props.id);
     } catch (err) {}
   };

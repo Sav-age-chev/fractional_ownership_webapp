@@ -41,7 +41,6 @@ const UserProperties = () => {
 
   //function triggered upon deletion that filter the property list by comparing against the id of recently deleted 
   const propertyDeletedHandler = (deletedPropertyId) => {
-    console.log("UserProperties: " + deletedPropertyId);   //<--------- diagnostic ------------ DELETE ME ! ---------------------
     setLoadedProperties((prevProperty) =>
       prevProperty.filter((property) => property.id !== deletedPropertyId)
     );
